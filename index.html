@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,minimum-scale=1,user-scalable=yes,viewport-fit=cover">
 <title>成通公司智能出差日志管理系统</title>
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
@@ -34,7 +34,7 @@
   --shadow:0 8px 32px #00000040;
   --transition:.18s ease;
 }
-html{font-size:14px;scroll-behavior:smooth}
+html{font-size:14px;scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
 body{
   font-family:'PingFang SC','Microsoft YaHei',sans-serif;
   background:linear-gradient(135deg,var(--bg-from) 0%,var(--bg-to) 100%);
@@ -42,6 +42,7 @@ body{
   color:var(--text);
   min-height:100vh;
   overflow-x:hidden;
+  -webkit-text-size-adjust:100%;
 }
 body::before{
   content:'';
@@ -420,20 +421,105 @@ textarea{resize:vertical;min-height:60px}
   .right-panel{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 }
 @media(max-width:640px){
-  .header{padding:0 12px;height:56px}
-  .logo-tagline{display:none}
-  .logo-icon{width:36px;height:36px;border-radius:10px}
-  .logo-icon-text{font-size:1rem}
-  .logo-icon-ring{border-radius:12px;inset:-2px}
-  .logo-main{font-size:1rem}
-  .logo-en{font-size:.7rem}
-  .main-layout{padding:10px;gap:10px}
-  .search-bar{grid-template-columns:1fr 1fr}
-  .form-row.cols-3,.form-row.cols-4{grid-template-columns:1fr 1fr}
-  .right-panel{grid-template-columns:1fr}
-  .modal{margin:0;border-radius:var(--radius) var(--radius) 0 0;position:fixed;bottom:0;left:0;right:0;max-height:92vh;overflow-y:auto}
+  /* ===== 头部精简 ===== */
+  .header{padding:0 14px;height:56px}
+  .logo-emblem{width:42px;height:42px}
+  .logo-emblem::before{inset:-3px}
+  .logo-train-emoji{font-size:1.5rem}
+  .logo-cn{font-size:1.1rem}
+  .logo-crsc{font-size:.62rem;padding:1px 6px}
+  .logo-sysname{display:none}
+  .logo-divider{display:none}
+  .logo-slogan{font-size:.65rem;letter-spacing:.08em}
+  .sync-indicator span{display:none}
+  .sync-indicator{padding:5px 6px}
+  .export-wrap .btn-ghost{font-size:.75rem;padding:5px 8px}
+
+  /* ===== 主体布局 ===== */
+  .main-layout{padding:12px;gap:12px}
+
+  /* ===== 搜索栏 - 全部单列 ===== */
+  .search-bar{grid-template-columns:1fr;gap:6px}
+  .search-bar input,.search-bar select{font-size:16px !important;padding:10px 12px !important}
+
+  /* ===== 日志卡片 ===== */
+  .log-list{max-height:calc(100vh - 280px);gap:8px}
+  .log-card{padding:12px 14px}
+  .log-card-title{font-size:.88rem}
+
+  /* ===== Modal - 全屏体验 ===== */
+  .modal{margin:0;border-radius:20px 20px 0 0;position:fixed;bottom:0;left:0;right:0;max-height:96vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
   .modal-overlay{align-items:flex-end;padding:0}
-  .stat-grid{grid-template-columns:1fr 1fr}
+  .modal-header{padding:14px 16px;position:sticky;top:0;z-index:10}
+  .modal-title{font-size:1rem}
+  .modal-body{padding:12px 14px 90px;gap:10px}
+
+  /* ===== 表单 - 移动端全单列 ===== */
+  .form-row.cols-2,
+  .form-row.cols-3,
+  .form-row.cols-4{grid-template-columns:1fr}
+  .form-row{gap:12px;margin-bottom:12px}
+
+  /* ===== 增大触控目标 ===== */
+  input,select,textarea{
+    font-size:16px !important;
+    padding:11px 14px !important;
+    min-height:48px;
+    border-radius:10px !important;
+  }
+  select{
+    appearance:none;
+    -webkit-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E") !important;
+    background-repeat:no-repeat !important;
+    background-position:right 12px center !important;
+    padding-right:36px !important;
+  }
+  textarea{min-height:80px}
+  .form-label{font-size:.78rem;margin-bottom:6px}
+
+  /* ===== 模板行 ===== */
+  .tpl-row{flex-direction:column;gap:8px}
+  .tpl-row select,.tpl-row button{width:100%}
+
+  /* ===== Section Block ===== */
+  .section-header{padding:12px 14px}
+  .section-header-left{font-size:.85rem}
+  .section-body{padding:12px 14px;gap:10px}
+
+  /* ===== 动态行 ===== */
+  .dyn-row{padding:10px 0 10px 0;padding-right:36px}
+
+  /* ===== 添加按钮 ===== */
+  .add-row-btn{padding:11px;font-size:.85rem;margin-top:4px}
+
+  /* ===== Toggle ===== */
+  .toggle-wrap{font-size:.85rem;padding:4px 0}
+
+  /* ===== 底部操作栏 - 固定在键盘上方 ===== */
+  .modal-footer{
+    position:sticky;bottom:0;z-index:10;
+    flex-direction:column;gap:10px;
+    padding:14px 16px;
+    padding-bottom:calc(14px + env(safe-area-inset-bottom, 0px));
+    background:linear-gradient(180deg,transparent,#1a0e3aee 20%,#1a0e3a);
+    border-top:1px solid var(--glass-border);
+    border-radius:0;
+  }
+  .modal-footer>div:last-child{width:100%}
+  .modal-footer>div:last-child .btn{flex:1;justify-content:center;padding:12px 16px;font-size:.9rem}
+
+  /* ===== 统计卡片 ===== */
+  .stat-grid{grid-template-columns:1fr 1fr;gap:8px}
+
+  /* ===== 右侧面板 ===== */
+  .right-panel{grid-template-columns:1fr}
+
+  /* ===== Filter tags ===== */
+  .tag-btn{padding:6px 14px;font-size:.82rem}
+
+  /* ===== Badge ===== */
+  .badge{font-size:.7rem;padding:2px 6px}
 }
 
 /* ===== 动画 ===== */
@@ -451,6 +537,24 @@ textarea{resize:vertical;min-height:60px}
 .fw-bold{font-weight:700}
 .mt-8{margin-top:8px}
 .mb-8{margin-bottom:8px}
+
+/* ===== 移动端悬浮新建按钮 (桌面隐藏) ===== */
+.fab-create{display:none}
+@media(max-width:640px){
+  .fab-create{
+    display:flex;align-items:center;justify-content:center;
+    position:fixed;right:20px;bottom:24px;z-index:90;
+    width:56px;height:56px;border-radius:50%;border:none;
+    background:linear-gradient(135deg,var(--primary),var(--primary-light));
+    color:#fff;font-size:1.5rem;cursor:pointer;
+    box-shadow:0 4px 20px #6240b060,0 8px 32px #00000040;
+    transition:transform .2s,box-shadow .2s;
+    animation:fabPulse 2.5s ease-in-out infinite;
+  }
+  .fab-create:hover{transform:scale(1.08);box-shadow:0 6px 28px #6240b080}
+  .fab-create:active{transform:scale(.95)}
+  @keyframes fabPulse{0%,100%{box-shadow:0 4px 20px #6240b060,0 8px 32px #00000040}50%{box-shadow:0 4px 28px #6240b0a0,0 8px 40px #00000050}}
+}
 </style>
 </head>
 <body>
@@ -1035,6 +1139,9 @@ textarea{resize:vertical;min-height:60px}
 </div>
 </transition>
 
+<!-- 移动端悬浮新建按钮 -->
+<button v-if="!isReadOnly && !showModal" class="fab-create" @click="openCreate">✚</button>
+
 </div><!-- end #app -->
 <script>
 // ===== 城市/国家数据 =====
@@ -1350,14 +1457,16 @@ const app = createApp({
       editingId.value = null;
       Object.assign(form, emptyForm());
       selectedTpl.value = '';
-      Object.keys(sections).forEach(k=>sections[k]=true);
+      const isMobile = window.innerWidth <= 640;
+      Object.keys(sections).forEach(k=>sections[k] = isMobile ? (k==='base') : true);
       showModal.value = true;
     }
     function openEdit(log) {
       editingId.value = log.id;
       const f = JSON.parse(JSON.stringify(log));
       Object.assign(form, f);
-      Object.keys(sections).forEach(k=>sections[k]=true);
+      const isMobile = window.innerWidth <= 640;
+      Object.keys(sections).forEach(k=>sections[k] = isMobile ? (k==='base') : true);
       showModal.value = true;
     }
     function toggleSection(k){ sections[k] = !sections[k]; }
