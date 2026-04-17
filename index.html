@@ -1,678 +1,868 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>成通公司智能出差日志管理系统</title>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-    <style>
-        :root {
-            --primary: #6240b0; /* 紫罗兰 */
-            --accent: #ffbf00;  /* 琥珀金 */
-            --bg-dark: #0f0c29;
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --text-light: #f8f9fa;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-
-        body {
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            background-attachment: fixed;
-            color: var(--text-light);
-            min-height: 100vh;
-            padding-bottom: 50px;
-        }
-
-        /* 玻璃态通用样式 */
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
-            transition: transform 0.3s ease;
-        }
-
-        /* 头部区域 */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 40px;
-            background: rgba(0, 0, 0, 0.2);
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .logo-group { display: flex; align-items: center; gap: 15px; }
-        .logo-badge {
-            background: linear-gradient(45deg, #1a237e, #0d47a1);
-            color: var(--accent);
-            padding: 8px 15px;
-            border-radius: 4px;
-            font-weight: bold;
-            border-left: 4px solid var(--accent);
-        }
-        .slogan { font-size: 0.9rem; color: #aaa; letter-spacing: 2px; }
-
-        .sync-status { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; }
-        .dot.success { background: #00e676; box-shadow: 0 0 10px #00e676; }
-        .dot.error { background: #ff1744; box-shadow: 0 0 10px #ff1744; }
-        .dot.syncing { animation: blink 1s infinite; background: var(--accent); }
-
-        @keyframes blink { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
-
-        /* 主布局 */
-        main {
-            display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
-            gap: 25px;
-            padding: 30px 40px;
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-
-        /* 列表区域 */
-        .list-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .badge-count { background: var(--primary); padding: 2px 10px; border-radius: 20px; font-size: 0.8rem; }
-
-        .filter-bar {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-            padding: 20px;
-        }
-
-        .input-group input, .input-group select {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 8px;
-            outline: none;
-        }
-
-        /* 日志卡片 */
-        .log-card {
-            padding: 20px;
-            margin-bottom: 20px;
-            position: relative;
-        }
-        .log-card:hover { transform: translateY(-5px); }
-        .log-card.reimbursed { opacity: 0.8; border-left: 5px solid #00e676; }
-
-        .card-top { display: flex; justify-content: space-between; margin-bottom: 15px; }
-        .project-tag { color: var(--accent); font-weight: bold; font-size: 1.1rem; }
-        .date-range { font-size: 0.9rem; color: #ccc; }
-
-        .cost-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            font-size: 0.85rem;
-        }
-        .cost-item { background: rgba(0, 0, 0, 0.2); padding: 8px; border-radius: 6px; }
-        .cost-val { display: block; font-weight: bold; font-size: 1rem; margin-top: 4px; }
-
-        .reimburse-total {
-            margin-top: 15px;
-            border-top: 1px solid var(--glass-border);
-            padding-top: 10px;
-            text-align: right;
-            font-size: 1.2rem;
-            color: var(--accent);
-        }
-
-        /* 图表容器 */
-        .chart-box { height: 300px; margin-bottom: 25px; padding: 15px; }
-
-        /* 侧边栏卡片 */
-        .stat-card { padding: 20px; margin-bottom: 20px; }
-        .stat-card h3 { font-size: 1rem; color: #aaa; margin-bottom: 10px; }
-        .stat-card .val { font-size: 1.8rem; font-weight: bold; }
-
-        /* 模态框 */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            width: 90%; max-width: 1000px; height: 90vh;
-            overflow-y: auto; padding: 30px;
-        }
-        .section-block { margin-bottom: 20px; border: 1px solid var(--glass-border); border-radius: 8px; }
-        .section-header {
-            padding: 12px 20px; background: rgba(255,255,255,0.05);
-            cursor: pointer; display: flex; justify-content: space-between;
-        }
-        .section-body { padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .full-width { grid-column: span 2; }
-
-        /* 响应式 */
-        @media (max-width: 1024px) {
-            main { grid-template-columns: 1fr; }
-            header { padding: 15px 20px; }
-        }
-
-        /* 按钮样式 */
-        .btn {
-            padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer;
-            font-weight: bold; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
-        }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: #7a56d1; }
-        .btn-outline { background: transparent; border: 1px solid var(--glass-border); color: white; }
-        .btn-accent { background: var(--accent); color: #000; }
-        .btn-danger { background: #ff1744; color: white; }
-
-        /* Datalist 样式修正 */
-        datalist { background: var(--bg-dark); }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes, viewport-fit=cover">
+  <title>成通公司 · 智行日志 · 旗舰版</title>
+  <!-- 字体与图标 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- 核心库 -->
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(145deg, #f5f0ff 0%, #e3e9ff 100%);
+      min-height: 100vh;
+      padding: 20px 16px;
+      color: #1a1f36;
+    }
+    @media (min-width: 768px) { body { padding: 28px 36px; } }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: radial-gradient(circle at 30% 40%, rgba(120, 90, 220, 0.06) 0%, transparent 30%),
+                      radial-gradient(circle at 80% 70%, rgba(250, 160, 100, 0.05) 0%, transparent 40%);
+      pointer-events: none;
+      z-index: -1;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 28px;
+      box-shadow: 0 20px 40px -12px rgba(45, 30, 80, 0.15), 0 4px 18px rgba(0,0,0,0.02);
+      transition: transform 0.2s, box-shadow 0.2s;
+      padding: 20px 16px;
+      margin-bottom: 20px;
+    }
+    @media (min-width: 768px) { .glass-card { border-radius: 38px; padding: 24px 28px; } }
+    .glass-card:hover { box-shadow: 0 28px 50px -16px rgba(70, 40, 130, 0.2); transform: translateY(-2px); background: rgba(255, 255, 255, 0.6); }
+    .app-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+    @media (min-width: 768px) { .app-header { margin-bottom: 32px; } }
+    .logo-area { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .crsc-badge {
+      background: linear-gradient(135deg, #1a2a6c, #2a4a8c);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 1.2rem;
+      letter-spacing: 1px;
+      box-shadow: 0 8px 18px -6px #1a2a6c60;
+      border: 1px solid #ffffff90;
+      backdrop-filter: blur(5px);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .crsc-badge i { font-size: 1.4rem; }
+    .slogan {
+      background: rgba(255, 215, 150, 0.7);
+      backdrop-filter: blur(4px);
+      padding: 6px 18px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #3d2b1a;
+      border: 1px solid #ffeac2;
+    }
+    .btn { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.9); padding: 10px 18px; border-radius: 60px; font-weight: 550; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.15s; color: #2b1b54; box-shadow: 0 8px 16px -8px rgba(50, 30, 80, 0.1); white-space: nowrap; }
+    @media (min-width: 768px) { .btn { padding: 12px 24px; font-size: 0.95rem; } }
+    .btn i { font-size: 1rem; }
+    .btn-primary { background: #6240b0; border-color: #9b80e0; color: white; box-shadow: 0 14px 22px -12px #4f3a8f; }
+    .btn-primary:hover { background: #4f2e9e; }
+    .btn-outline { background: transparent; border: 1px solid #b6a2e0; }
+    .btn-outline:hover { background: #f0eaff; }
+    .main-grid { display: flex; flex-direction: column; gap: 24px; }
+    @media (min-width: 1024px) { .main-grid { display: grid; grid-template-columns: 1.2fr 0.9fr; gap: 28px; } }
+    .search-section { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+    .search-pill { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(4px); border-radius: 60px; padding: 2px 4px 2px 18px; border: 1px solid #ffffffc0; display: flex; align-items: center; flex: 1 0 150px; }
+    .search-pill i { color: #5e4b8b; margin-right: 6px; }
+    .search-pill input { border: none; padding: 12px 0; background: transparent; outline: none; width: 100%; color: #1e1836; }
+    .quick-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .filter-tag { background: rgba(255,255,255,0.4); backdrop-filter: blur(4px); padding: 6px 16px; border-radius: 60px; font-size: 0.8rem; cursor: pointer; border: 1px solid #d2c4f0; transition: 0.1s; }
+    .filter-tag.active { background: #6240b0; color: white; border-color: #6240b0; }
+    .log-feed { max-height: 550px; overflow-y: auto; padding-right: 4px; }
+    .log-card {
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(14px);
+      border-radius: 24px;
+      padding: 16px 18px;
+      margin-bottom: 14px;
+      border: 1px solid #ffffffd0;
+      box-shadow: 0 18px 30px -16px #2a1e4e20;
+      transition: all 0.2s;
+      border-left: 5px solid #6240b0;
+    }
+    .log-card.reimbursed { border-left-color: #2e8b57; opacity: 0.85; }
+    @media (min-width: 768px) { .log-card { padding: 20px 24px; border-radius: 30px; } }
+    .log-card:hover { background: rgba(255,255,255,0.7); transform: scale(1.01); }
+    .badge { background: #e5d9ffc0; backdrop-filter: blur(4px); padding: 4px 12px; border-radius: 60px; font-size: 0.75rem; font-weight: 500; color: #382a66; }
+    .amount-tag { background: linear-gradient(145deg, #f2ecfe, #ffffff); border-radius: 60px; padding: 8px 16px; font-weight: 700; font-size: 0.9rem; box-shadow: inset 0 1px 4px #ffffff, 0 8px 12px -8px #3d2b70; }
+    .personal-tag { background: linear-gradient(145deg, #ffe8d4, #fff3e6); border-radius: 60px; padding: 6px 14px; font-weight: 600; font-size: 0.85rem; color: #9b5e2e; }
+    .chart-card { padding: 16px; margin-bottom: 20px; }
+    @media (min-width: 768px) { .chart-card { padding: 24px 22px; margin-bottom: 28px; } }
+    .chart-container { height: 200px; width: 100%; }
+    .modal-mask { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(20, 10, 40, 0.3); backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 12px; }
+    .modal { background: rgba(255, 245, 250, 0.9); backdrop-filter: blur(30px); max-width: 1000px; width: 100%; max-height: 90vh; overflow-y: auto; border-radius: 32px; padding: 24px 20px; border: 1px solid #fffa; box-shadow: 0 50px 80px -20px #1f153e; }
+    @media (min-width: 768px) { .modal { width: 94%; border-radius: 48px; padding: 34px 38px; } }
+    .input-modern { background: rgba(255,255,255,0.8); border: 1px solid #d2c4f0; border-radius: 40px; padding: 12px 16px; font-size: 0.9rem; backdrop-filter: blur(4px); width: 100%; }
+    @media (min-width: 768px) { .input-modern { padding: 14px 20px; font-size: 0.95rem; } }
+    .dynamic-block { background: rgba(245, 235, 255, 0.5); backdrop-filter: blur(8px); border-radius: 24px; padding: 16px; margin: 16px 0; border: 1px solid #ffffffd0; }
+    @media (min-width: 768px) { .dynamic-block { border-radius: 32px; padding: 22px; margin: 18px 0; } }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .location-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .action-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .log-header-meta { display: flex; flex-direction: column; gap: 4px; }
+    @media (min-width: 640px) { .log-header-meta { flex-direction: row; justify-content: space-between; align-items: center; } }
+    .hide-mobile { display: none; }
+    @media (min-width: 640px) { .hide-mobile { display: inline; } }
+    .transport-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .transport-row .input-modern { width: auto; flex: 1 1 120px; }
+    .collapse-header { cursor: pointer; user-select: none; display: flex; align-items: center; gap: 8px; }
+    .collapse-header i { transition: transform 0.2s; font-size: 1rem; }
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-menu {
+      position: absolute; top: 100%; right: 0; margin-top: 8px;
+      background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+      border-radius: 24px; padding: 8px; box-shadow: 0 20px 30px -10px #1f153e40;
+      border: 1px solid #ffffff; z-index: 100; min-width: 140px;
+    }
+    .dropdown-item {
+      display: flex; align-items: center; gap: 10px; padding: 12px 18px;
+      border-radius: 40px; cursor: pointer; transition: 0.1s; color: #1e3a5f; font-weight: 500;
+    }
+    .dropdown-item:hover { background: #f0eaff; }
+    .contact-group { margin-bottom: 16px; border-bottom: 1px dashed #cbb5e0; padding-bottom: 8px; }
+    .group-header { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600; color: #2b1b54; padding: 8px 0; }
+    .group-header i { font-size: 1rem; transition: transform 0.2s; }
+    .contact-items { padding-left: 24px; display: flex; flex-direction: column; gap: 6px; }
+    .contact-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+    .title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+    .sync-status { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #2b6a4e; }
+    .sync-status i { font-size: 1rem; }
+    .syncing { animation: spin 1s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+  </style>
 </head>
 <body>
-
-<div id="app" v-cloak>
-    <header>
-        <div class="logo-group">
-            <div class="logo-badge">通号公司 · CRSC</div>
-            <div class="slogan">一带一路 · 畅行全球</div>
+<div id="app">
+  <!-- 头部 -->
+  <div class="app-header">
+    <div class="logo-area">
+      <div class="crsc-badge">
+        <i class="fas fa-train"></i> 通号公司 · CRSC
+        <span class="slogan" style="margin-left: 8px;"><i class="fas fa-globe-asia"></i> 一带一路 · 畅行全球</span>
+      </div>
+    </div>
+    <div class="action-bar">
+      <div class="sync-status">
+        <i class="fas" :class="syncIcon" :style="{ color: syncColor }" :title="syncTooltip"></i>
+        <span v-if="lastSyncTime">{{ lastSyncTime }}</span>
+      </div>
+      <div class="dropdown">
+        <button class="btn btn-outline" @click="showExportMenu = !showExportMenu">
+          <i class="fas fa-download"></i><span class="hide-mobile">导出</span> <i class="fas fa-chevron-down" style="font-size:0.8rem;"></i>
+        </button>
+        <div v-if="showExportMenu" class="dropdown-menu" @click.stop>
+          <div class="dropdown-item" @click="exportData('excel'); showExportMenu=false"><i class="fas fa-file-excel"></i> Excel 文件</div>
+          <div class="dropdown-item" @click="exportData('word'); showExportMenu=false"><i class="fas fa-file-word"></i> Word 文件</div>
+          <div class="dropdown-item" @click="exportData('pdf'); showExportMenu=false"><i class="fas fa-file-pdf"></i> PDF 文件</div>
         </div>
-        <div style="display: flex; align-items: center; gap: 20px;">
-            <div class="sync-status">
-                <span :class="['dot', syncInfo.status]"></span>
-                <span>{{ syncInfo.text }} {{ syncInfo.lastTime }}</span>
-            </div>
-            <button class="btn btn-outline" @click="exportExcel">
-                <i class="fas fa-file-excel"></i> 导出 Excel
-            </button>
-            <button v-if="isReadOnly" class="btn btn-accent" @click="exitReadOnly">退出只读</button>
+      </div>
+      <button v-if="isReadonlyMode" class="btn btn-outline" @click="exitReadonlyMode">退出只读</button>
+    </div>
+  </div>
+
+  <div v-if="isReadonlyMode" class="glass-card" style="margin-bottom:20px; padding:12px 20px; background:#ffeec2a0;">
+    <i class="fas fa-lock"></i> 只读模式 · 共 {{ logs.length }} 条分享日志
+  </div>
+
+  <div class="main-grid">
+    <!-- 左侧列表 -->
+    <div>
+      <div class="glass-card">
+        <div class="title-row">
+          <h2 style="font-size:1.4rem;"><i class="fas fa-list-check"></i> 出差日志</h2>
+          <button class="btn btn-primary" @click="openNewLogModal"><i class="fas fa-plus-circle"></i><span class="hide-mobile">新建出差</span></button>
         </div>
-    </header>
-
-    <main>
-        <section>
-            <div class="list-header">
-                <h2>出差日志 <span class="badge-count">{{ filteredLogs.length }}</span></h2>
-                <button v-if="!isReadOnly" class="btn btn-primary" @click="openModal()">
-                    <i class="fas fa-plus"></i> 新建出差
-                </button>
-            </div>
-
-            <div class="glass-card filter-bar">
-                <div class="input-group">
-                    <input type="date" v-model="filters.start" placeholder="开始日期">
-                </div>
-                <div class="input-group">
-                    <input type="date" v-model="filters.end" placeholder="结束日期">
-                </div>
-                <div class="input-group">
-                    <input type="text" v-model="filters.search" placeholder="搜索项目、酒店、联系人...">
-                </div>
-                <button class="btn btn-outline" @click="resetFilters">重置</button>
-            </div>
-
-            <div v-for="log in filteredLogs" :key="log.id" :class="['glass-card', 'log-card', {reimbursed: log.reimbursed}]">
-                <div class="card-top">
-                    <div>
-                        <div class="project-tag">{{ log.projectName }}</div>
-                        <div class="date-range">{{ log.startDate }} 至 {{ log.endDate }} ({{ log.days }}天)</div>
-                    </div>
-                    <div style="display: flex; gap: 15px; align-items: center;">
-                        <label v-if="!isReadOnly" style="font-size: 0.8rem; cursor: pointer;">
-                            <input type="checkbox" v-model="log.reimbursed" @change="saveToCloud"> 已报销
-                        </label>
-                        <i v-if="!isReadOnly" class="fas fa-edit" style="cursor:pointer" @click="openModal(log)"></i>
-                        <i v-if="!isReadOnly" class="fas fa-trash-alt" style="color:#ff1744; cursor:pointer" @click="deleteLog(log.id)"></i>
-                    </div>
-                </div>
-
-                <div class="cost-grid">
-                    <div class="cost-item">交通: <span class="cost-val">¥{{ log.totalTransport }}</span></div>
-                    <div class="cost-item">用餐: <span class="cost-val">¥{{ log.totalMeal }}</span></div>
-                    <div class="cost-item">招待: <span class="cost-val">¥{{ log.totalEntertain }}</span></div>
-                    <div class="cost-item">补贴: <span class="cost-val">¥{{ log.subsidyTotal }}</span></div>
-                    <div class="cost-item">垫资: <span class="cost-val">¥{{ log.totalAdvance }}</span></div>
-                    <div class="cost-item" v-if="log.personalTotal > 0" style="color: #ff8a80;">
-                        个人支出: <span class="cost-val">¥{{ log.personalTotal.toFixed(2) }}</span>
-                    </div>
-                </div>
-
-                <div class="reimburse-total">
-                    公司报销总额: <strong>¥{{ log.reimbursementTotal.toFixed(2) }}</strong>
-                </div>
-            </div>
-        </section>
-
-        <aside>
-            <div class="glass-card stat-card">
-                <h3>报销状态统计</h3>
-                <div style="display: flex; justify-content: space-between; margin-top: 15px;">
-                    <div>
-                        <p style="font-size: 0.8rem; opacity: 0.7;">未报销</p>
-                        <p class="val" style="color: #ffbf00;">¥{{ stats.unreimbursed.toFixed(2) }}</p>
-                    </div>
-                    <div>
-                        <p style="font-size: 0.8rem; opacity: 0.7;">已报销</p>
-                        <p class="val" style="color: #00e676;">¥{{ stats.reimbursed.toFixed(2) }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="glass-card chart-box" id="sankeyChart"></div>
-            
-            <div class="glass-card chart-box" id="barChart"></div>
-
-            <div class="glass-card stat-card">
-                <h3>常用联系人 (按项目)</h3>
-                <div v-for="(contacts, project) in groupedContacts" :key="project" style="margin-top: 10px;">
-                    <div style="color: var(--accent); font-weight: bold; border-bottom: 1px solid var(--glass-border); padding-bottom: 5px;">
-                        {{ project }}
-                    </div>
-                    <div v-for="c in contacts" :key="c.contact" style="font-size: 0.85rem; padding: 5px 0;">
-                        {{ c.name }}: {{ c.contact }}
-                    </div>
-                </div>
-            </div>
-        </aside>
-    </main>
-
-    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
-        <div class="glass-card modal-content">
-            <h2 style="margin-bottom: 25px;">{{ form.id ? '编辑出差日志' : '新建出差日志' }}</h2>
-
-            <div class="section-block">
-                <div class="section-header" @click="sections.base = !sections.base">
-                    <span><i class="fas fa-info-circle"></i> 基础信息</span>
-                    <i :class="['fas', sections.base ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
-                </div>
-                <div v-show="sections.base" class="section-body">
-                    <div class="input-group">
-                        <label>开始日期</label>
-                        <input type="date" v-model="form.startDate" @change="calcDays">
-                    </div>
-                    <div class="input-group">
-                        <label>结束日期</label>
-                        <input type="date" v-model="form.endDate" @change="calcDays">
-                    </div>
-                    <div class="input-group">
-                        <label>酒店名称</label>
-                        <input type="text" v-model="form.hotelName">
-                    </div>
-                    <div class="input-group">
-                        <label>每晚价格</label>
-                        <input type="number" v-model.number="form.hotelPrice">
-                    </div>
-                    <div class="input-group">
-                        <label>同住人数 (1-7)</label>
-                        <input type="number" v-model.number="form.roommateCount" min="1" max="7">
-                    </div>
-                    <div class="input-group" style="display: flex; align-items: center; gap: 10px;">
-                        <input type="checkbox" v-model="form.hotelAA"> <span>住宿是否AA分摊</span>
-                    </div>
-                    <div class="input-group full-width">
-                        <label>项目名称</label>
-                        <input type="text" v-model="form.projectName">
-                    </div>
-                </div>
-            </div>
-
-            <div class="section-block">
-                <div class="section-header" @click="sections.loc = !sections.loc">
-                    <span><i class="fas fa-map-marker-alt"></i> 地点与补贴</span>
-                    <i :class="['fas', sections.loc ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
-                </div>
-                <div v-show="sections.loc" class="section-body">
-                    <div class="input-group">
-                        <label>区域</label>
-                        <select v-model="form.regionType">
-                            <option value="domestic">国内</option>
-                            <option value="international">国际</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label>省份/国家</label>
-                        <input type="text" v-model="form.province" list="provinceList">
-                    </div>
-                    <div class="input-group">
-                        <label>城市</label>
-                        <input type="text" v-model="form.city">
-                    </div>
-                    <div class="input-group">
-                        <label>补贴标准</label>
-                        <select v-model="form.subsidyType">
-                            <option value="preset">固定档次</option>
-                            <option value="custom">自定义</option>
-                        </select>
-                    </div>
-                    <div class="input-group" v-if="form.subsidyType === 'preset'">
-                        <label>选择档次</label>
-                        <select v-model.number="form.subsidyAmount">
-                            <option v-for="v in [220, 260, 290, 320, 340, 450]" :value="v">{{ v }} 元/天</option>
-                        </select>
-                    </div>
-                    <div class="input-group" v-else>
-                        <label>手动金额</label>
-                        <input type="number" v-model.number="form.customSubsidy">
-                    </div>
-                </div>
-            </div>
-
-            <div class="section-block">
-                <div class="section-header" @click="sections.transport = !sections.transport">
-                    <span><i class="fas fa-train"></i> 交通行程 ({{ form.transports.length }})</span>
-                    <button class="btn btn-primary" style="padding: 2px 10px; font-size: 0.7rem;" @click.stop="addTransport">+ 添加</button>
-                </div>
-                <div v-show="sections.transport" class="section-body">
-                    <div v-for="(t, idx) in form.transports" :key="idx" class="full-width glass-card" style="padding: 15px; margin-bottom: 10px;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px;">
-                            <select v-model="t.type">
-                                <option>高铁</option><option>飞机</option><option>出租车</option><option>网约车</option><option>公交车</option>
-                            </select>
-                            <input type="number" v-model.number="t.price" placeholder="金额">
-                            <input type="text" v-model="t.from" placeholder="出发地">
-                            <button class="btn btn-danger" @click="form.transports.splice(idx, 1)">×</button>
-                            <input type="text" v-model="t.to" placeholder="目的地" class="full-width">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div style="margin-top: 20px; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <span style="opacity: 0.7;">预估报销总额:</span>
-                    <strong style="font-size: 1.5rem; color: var(--accent); margin-left: 10px;">¥{{ currentTotal.reimburse.toFixed(2) }}</strong>
-                </div>
-                <div style="display: flex; gap: 15px;">
-                    <button class="btn btn-outline" @click="closeModal">取消</button>
-                    <button class="btn btn-accent" @click="saveLog">保存并同步</button>
-                </div>
-            </div>
+        <div class="search-section">
+          <div class="search-pill"><i class="far fa-calendar"></i><input type="date" v-model="filter.startDate"></div>
+          <div class="search-pill"><i class="far fa-calendar-check"></i><input type="date" v-model="filter.endDate"></div>
+          <div class="search-pill"><i class="fas fa-search"></i><input v-model="filter.keyword" placeholder="搜索..."></div>
+          <button class="btn btn-outline" @click="clearFilter" style="flex:0 0 auto;">重置</button>
         </div>
+        <div class="quick-filters" v-if="projectList.length">
+          <span class="filter-tag" :class="{ active: selectedProject === '' }" @click="selectedProject = ''">全部</span>
+          <span class="filter-tag" v-for="p in projectList" :key="p" :class="{ active: selectedProject === p }" @click="selectedProject = p">{{ p }}</span>
+        </div>
+        <div class="log-feed">
+          <div v-if="filteredLogs.length===0" style="padding:40px;text-align:center;opacity:0.7;">
+            <i class="fas fa-map-pin" style="font-size:2.5rem;"></i><p>暂无记录，点击新建</p>
+          </div>
+          <div v-for="log in filteredLogs" :key="log.id" class="log-card" :class="{ reimbursed: log.reimbursed }">
+            <div class="log-header-meta">
+              <span><i class="fas fa-hotel"></i> {{ log.hotelName || '酒店' }} · {{ log.projectName || '项目' }}</span>
+              <span style="font-size:0.85rem;">{{ log.startDate }} ~ {{ log.endDate }} ({{ log.days }}天)</span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px 12px; margin: 12px 0; font-size:0.85rem;">
+              <span>🚄 ¥{{ log.totalTransport }}</span><span>🍽️ ¥{{ log.totalMeal }}</span>
+              <span>🎉 ¥{{ log.totalEntertain }}</span><span>💸 ¥{{ log.totalAdvance }}</span>
+              <span class="badge">补贴 ¥{{ log.subsidyTotal }}</span>
+            </div>
+            <div class="flex-between">
+              <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+                <span class="amount-tag"><i class="fas fa-coins"></i> 报销 ¥{{ log.reimbursementTotal }}</span>
+                <span class="personal-tag" v-if="log.personalTotal > 0"><i class="fas fa-user"></i> 个人 ¥{{ log.personalTotal }}</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size:0.85rem;">
+                  <input type="checkbox" v-model="log.reimbursed" @change="syncWithStatus"> 已报销
+                </label>
+                <span v-if="!isReadonlyMode">
+                  <i class="fas fa-edit" @click="editLog(log)" style="margin-right:8px; cursor:pointer;"></i>
+                  <i class="fas fa-trash-alt" @click="deleteLog(log.id)" style="cursor:pointer;"></i>
+                </span>
+              </div>
+            </div>
+            <div v-if="log.hotelAA && log.roommateCount>1" style="margin-top:8px; font-size:0.8rem; color:#5e4b8b;">
+              🛏️ 住宿AA人均¥{{ (log.hotelPrice * log.days / log.roommateCount).toFixed(0) }}
+            </div>
+            <div v-if="log.personalMealCost > 0" style="margin-top:4px; font-size:0.8rem; color:#5e4b8b;">
+              🍽️ 用餐AA个人¥{{ log.personalMealCost }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="glass-card">
+        <h3 style="font-size:1.2rem;"><i class="fas fa-chart-pie"></i> 按项目统计报销</h3>
+        <div v-for="(amt, proj) in projectStats" :key="proj" class="flex-between" style="padding:10px 0;">
+          <span>{{ proj }}</span><strong>¥{{ amt.toFixed(2) }}</strong>
+        </div>
+        <p v-if="Object.keys(projectStats).length===0" style="opacity:0.7;">暂无项目数据</p>
+      </div>
     </div>
 
-    <datalist id="provinceList">
-        <option v-for="p in constants.provinces" :value="p"></option>
-    </datalist>
+    <!-- 右侧面板 -->
+    <div>
+      <div class="glass-card chart-card">
+        <h3 style="font-size:1.2rem;"><i class="fas fa-chart-sankey"></i> 费用流向</h3>
+        <div class="chart-container" id="sankeyChart"></div>
+      </div>
+      <div class="glass-card chart-card">
+        <div class="flex-between">
+          <h3 style="font-size:1.2rem;"><i class="fas fa-chart-bar"></i> 日志报销</h3>
+          <select v-model="chartPeriod" @change="renderBarChart" class="input-modern" style="width:120px;">
+            <option value="all">全部</option>
+            <option value="month">按月</option>
+            <option value="quarter">按季度</option>
+          </select>
+        </div>
+        <div class="chart-container" id="barChart"></div>
+      </div>
+      <div class="glass-card">
+        <h3 style="display: flex; gap: 8px; font-size:1.2rem;"><i class="fas fa-wallet"></i> 个人实际支出 <span class="badge" style="margin-left:auto;">¥{{ totalPersonalExpense }}</span></h3>
+        <div style="margin-top:16px;">
+          <div class="flex-between"><span>住宿AA分摊</span><span>¥{{ totalPersonalHotelAA }}</span></div>
+          <div class="flex-between"><span>用餐AA分摊</span><span>¥{{ totalPersonalMealAA }}</span></div>
+        </div>
+      </div>
+      <div class="glass-card">
+        <h3 style="display: flex; gap: 8px; font-size:1.2rem;"><i class="fas fa-file-invoice-dollar"></i> 报销状态</h3>
+        <div style="margin-top:16px;">
+          <div class="flex-between"><span><i class="fas fa-hourglass-half"></i> 未报销总额</span><strong style="color:#b45f2b;">¥{{ unreimbursedTotal }}</strong></div>
+          <div class="flex-between" style="margin-top:10px;"><span><i class="fas fa-check-circle" style="color:#2e8b57;"></i> 已报销总额</span><strong style="color:#2e8b57;">¥{{ reimbursedTotal }}</strong></div>
+          <hr style="margin:16px 0; border-color:#d2c4f0;">
+          <div class="flex-between"><span>公司报销总额 (全部)</span><span>¥{{ totalReimbursement }}</span></div>
+        </div>
+      </div>
+      <div class="glass-card">
+        <h3 style="font-size:1.2rem;"><i class="fas fa-address-book"></i> 常用联系人</h3>
+        <div style="margin-top:12px;">
+          <div v-for="group in contactGroups" :key="group.proj" class="contact-group">
+            <div class="group-header" @click="toggleContactGroup(group.proj)">
+              <i class="fas" :class="expandedGroups[group.proj] ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
+              <span>{{ group.proj }} ({{ group.items.length }})</span>
+            </div>
+            <div v-show="expandedGroups[group.proj]" class="contact-items">
+              <div v-for="(c, idx) in group.items" :key="idx" class="contact-item">
+                <i class="fas fa-user-circle"></i> {{ c.name }} {{ c.contact }}
+              </div>
+            </div>
+          </div>
+          <p v-if="contactGroups.length===0" style="opacity:0.7;">暂无联系人</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模态框（新建/编辑） -->
+  <div v-if="showModal && !isReadonlyMode" class="modal-mask" @click.self="closeModal">
+    <div class="modal">
+      <div class="flex-between"><h2 style="font-size:1.5rem;">{{ editingId ? '编辑' : '新建' }}出差</h2><i class="fas fa-times" @click="closeModal" style="font-size:1.8rem; cursor:pointer;"></i></div>
+      <div style="display:flex; gap:8px; margin:16px 0; flex-wrap:wrap;">
+        <select v-model="selectedTemplateId" @change="loadTemplate" class="input-modern" style="width:160px;"><option value="">加载模板</option><option v-for="t in templates" :key="t.id" :value="t.id">{{t.name}}</option></select>
+        <input v-model="newTemplateName" placeholder="模板名称" class="input-modern" style="width:140px;"><button class="btn btn-outline" @click="saveAsTemplate">保存</button>
+      </div>
+      <form @submit.prevent="saveLog">
+        <div class="flex-between">
+          <label>📅 开始</label><input type="date" v-model="form.startDate" class="input-modern" required>
+          <label>结束</label><input type="date" v-model="form.endDate" class="input-modern" required>
+          <span class="badge">{{ computedDays }}天</span>
+        </div>
+        <div class="flex-between" style="margin-top:16px;">
+          <input v-model="form.hotelName" placeholder="酒店" class="input-modern" style="width:140px;">
+          <input type="number" v-model="form.hotelPrice" placeholder="每晚价格" class="input-modern" style="width:120px;">
+          <select v-model.number="form.roommateCount" class="input-modern" style="width:90px;">
+            <option :value="1">1人</option><option v-for="n in 6" :value="n+1">{{n+1}}人</option>
+          </select>
+          <label><input type="checkbox" v-model="form.hotelAA"> AA</label>
+          <span v-if="form.hotelAA && form.roommateCount>1 && form.hotelPrice" class="badge">人均¥{{ ((form.hotelPrice * computedDays) / form.roommateCount).toFixed(0) }}</span>
+        </div>
+        <div class="location-row" style="margin-top:16px;">
+          <input v-model="form.projectName" placeholder="项目名称" class="input-modern" style="width:160px;">
+          <textarea v-model="form.workContent" placeholder="工作内容" rows="2" class="input-modern" style="flex:1;"></textarea>
+        </div>
+        <div class="location-row" style="margin-top:16px;">
+          <select v-model="form.regionType" class="input-modern" style="width:100px;">
+            <option value="domestic">国内</option><option value="international">国外</option>
+          </select>
+          <input list="provinceList" v-model="form.province" placeholder="省份/国家" class="input-modern" style="width:140px;" @change="onProvinceInput">
+          <datalist id="provinceList"><option v-for="p in provinceOptions" :value="p" :key="p">{{ p }}</option></datalist>
+          <input list="cityList" v-model="form.city" placeholder="城市" class="input-modern" style="width:140px;">
+          <datalist id="cityList"><option v-for="c in cityOptions" :value="c" :key="c">{{ c }}</option></datalist>
+          <input v-model="form.customLocation" placeholder="详细地址" class="input-modern" style="width:150px;">
+        </div>
+        <div class="flex-between" style="margin-top:16px;">
+          <select v-model="form.subsidyType" class="input-modern" style="width:120px;">
+            <option value="preset">固定</option><option value="custom">自定义</option>
+          </select>
+          <select v-if="form.subsidyType==='preset'" v-model="form.subsidyAmount" class="input-modern" style="width:130px;">
+            <option v-for="opt in subsidyOptions" :key="opt" :value="opt">{{ opt }}</option>
+          </select>
+          <input v-else type="number" v-model="form.customSubsidy" placeholder="自定义补贴" class="input-modern" style="width:150px;">
+        </div>
+        
+        <!-- 交通模块 -->
+        <div class="dynamic-block">
+          <div class="collapse-header flex-between" @click="collapsed.transport = !collapsed.transport">
+            <strong><i class="fas fa-bus"></i> 交通行程</strong>
+            <i class="fas" :class="collapsed.transport ? 'fa-chevron-down' : 'fa-chevron-up'"></i>
+          </div>
+          <div v-show="!collapsed.transport">
+            <button type="button" class="btn btn-outline" @click="addTransport" style="margin: 12px 0;">+添加交通</button>
+            <div v-for="(t,i) in form.transports" :key="i" style="margin-bottom:18px; border-bottom:1px dashed #cbb5e0; padding-bottom:12px;">
+              <div class="transport-row">
+                <select v-model="t.type" class="input-modern" style="width:110px;"><option>高铁</option><option>飞机</option><option>出租车</option><option>公交车</option><option>网约车</option></select>
+                <input type="number" v-model="t.price" placeholder="金额" class="input-modern" style="width:110px;">
+                <i class="fas fa-trash" @click="form.transports.splice(i,1)" style="cursor:pointer;"></i>
+              </div>
+              <div class="transport-row">
+                <input v-model="t.from" placeholder="出发地" class="input-modern" style="flex:2;">
+                <input v-model="t.via" placeholder="途径点（多个用逗号分隔）" class="input-modern" style="flex:3;">
+                <input v-model="t.to" placeholder="目的地" class="input-modern" style="flex:2;">
+              </div>
+              <div class="transport-row">
+                <input type="datetime-local" v-model="t.departureTime" class="input-modern" style="flex:1;">
+                <span>→</span>
+                <input type="datetime-local" v-model="t.arrivalTime" class="input-modern" style="flex:1;">
+              </div>
+            </div>
+            <div>交通小计: ¥{{ transportTotal }}</div>
+          </div>
+        </div>
+
+        <!-- 用餐模块 -->
+        <div class="dynamic-block">
+          <div class="collapse-header flex-between" @click="collapsed.meal = !collapsed.meal">
+            <strong><i class="fas fa-utensils"></i> 用餐记录</strong>
+            <i class="fas" :class="collapsed.meal ? 'fa-chevron-down' : 'fa-chevron-up'"></i>
+          </div>
+          <div v-show="!collapsed.meal">
+            <button type="button" class="btn btn-outline" @click="addMeal" style="margin: 12px 0;">+添加用餐</button>
+            <div v-for="(m,i) in form.meals" :key="i" style="margin-bottom:16px;">
+              <div class="flex-between">
+                <select v-model="m.mealType" class="input-modern"><option>早餐</option><option>午餐</option><option>晚餐</option></select>
+                <input type="number" v-model="m.amount" placeholder="总额" class="input-modern">
+                <select v-model.number="m.peopleCount" class="input-modern"><option v-for="n in 7" :value="n">{{n}}人</option></select>
+                <label><input type="checkbox" v-model="m.isAA"> AA</label>
+                <input v-model="m.payer" placeholder="付款人" class="input-modern">
+                <i class="fas fa-trash" @click="form.meals.splice(i,1)"></i>
+              </div>
+              <div v-if="m.isAA && m.peopleCount" class="badge" style="margin-top:6px;">
+                人均¥{{ (m.amount/m.peopleCount).toFixed(2) }} <span v-if="m.payer==='自己'||m.payer==='本人'">(您付¥{{ (m.amount/m.peopleCount).toFixed(2) }})</span>
+              </div>
+            </div>
+            <div>用餐总费用: ¥{{ mealTotal }}</div>
+          </div>
+        </div>
+
+        <!-- 招待模块 -->
+        <div class="dynamic-block">
+          <div class="collapse-header flex-between" @click="collapsed.entertain = !collapsed.entertain">
+            <strong><i class="fas fa-glass-cheers"></i> 项目招待</strong>
+            <i class="fas" :class="collapsed.entertain ? 'fa-chevron-down' : 'fa-chevron-up'"></i>
+          </div>
+          <div v-show="!collapsed.entertain">
+            <button type="button" class="btn btn-outline" @click="addEntertain" style="margin: 12px 0;">+添加招待</button>
+            <div v-for="(e,i) in form.entertains" :key="i" class="flex-between" style="margin-bottom:8px;">
+              <input v-model="e.guests" placeholder="人数" class="input-modern"><input v-model="e.location" placeholder="地点" class="input-modern">
+              <input type="datetime-local" v-model="e.time" class="input-modern"><input type="number" v-model="e.amount" placeholder="金额" class="input-modern">
+              <input v-model="e.description" placeholder="说明" class="input-modern"><i class="fas fa-trash" @click="form.entertains.splice(i,1)"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- 垫资模块 -->
+        <div class="dynamic-block">
+          <div class="collapse-header flex-between" @click="collapsed.advance = !collapsed.advance">
+            <strong><i class="fas fa-hand-holding-usd"></i> 垫资明细</strong>
+            <i class="fas" :class="collapsed.advance ? 'fa-chevron-down' : 'fa-chevron-up'"></i>
+          </div>
+          <div v-show="!collapsed.advance">
+            <button type="button" class="btn btn-outline" @click="addAdvance" style="margin: 12px 0;">+添加垫资</button>
+            <div v-for="(a,i) in form.advances" :key="i" class="flex-between" style="margin-bottom:8px;">
+              <input type="datetime-local" v-model="a.time" class="input-modern"><input v-model="a.description" placeholder="说明" class="input-modern">
+              <input type="number" v-model="a.amount" placeholder="金额" class="input-modern"><label><input type="checkbox" v-model="a.repaid">已回款</label>
+              <i class="fas fa-trash" @click="form.advances.splice(i,1)"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- 联系人模块 -->
+        <div class="dynamic-block">
+          <div class="collapse-header flex-between" @click="collapsed.contact = !collapsed.contact">
+            <strong><i class="fas fa-users"></i> 施工方联系人</strong>
+            <i class="fas" :class="collapsed.contact ? 'fa-chevron-down' : 'fa-chevron-up'"></i>
+          </div>
+          <div v-show="!collapsed.contact">
+            <button type="button" class="btn btn-outline" @click="addContact" style="margin: 12px 0;">+添加联系人</button>
+            <div v-for="(c,i) in form.contacts" :key="i" class="flex-between" style="margin-bottom:8px;">
+              <input v-model="c.name" placeholder="姓名" class="input-modern">
+              <input v-model="c.contact" placeholder="手机/微信" class="input-modern">
+              <input v-model="c.project" placeholder="关联项目" class="input-modern" :value="c.project || form.projectName">
+              <i class="fas fa-trash" @click="form.contacts.splice(i,1)"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex-between" style="margin-top:20px;">
+          <div style="display: flex; gap: 10px; flex-wrap:wrap;">
+            <span class="amount-tag">报销¥{{ computedReimbursement }}</span>
+            <span class="personal-tag" v-if="computedPersonalTotal>0">个人¥{{ computedPersonalTotal }}</span>
+          </div>
+          <div><button type="button" class="btn" @click="closeModal">取消</button><button type="submit" class="btn btn-primary">保存</button></div>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 
 <script>
-const { createApp, ref, reactive, computed, onMounted, watch, nextTick } = Vue;
+  (function(){
+    const { createApp, ref, reactive, computed, onMounted, nextTick, watch } = Vue;
+    
+    // 云同步配置
+    const CONFIG = {
+      BIN_ID: '69e219b636566621a8c2ebd1',
+      API_KEY: '$2a$10$1IN7DPNxJDC0m260.MuYHeWTFfESFF.DGfrivMk/rLM09EqpsFTXe',
+      BIN_URL: 'https://api.jsonbin.io/v3/b/69e219b636566621a8c2ebd1',
+      HEADERS: {
+        'X-Master-Key': '$2a$10$1IN7DPNxJDC0m260.MuYHeWTFfESFF.DGfrivMk/rLM09EqpsFTXe',
+        'Content-Type': 'application/json'
+      }
+    };
 
-const CLOUD_CONFIG = {
-    BIN_ID: '69e219b636566621a8c2ebd1',
-    API_KEY: '$2a$10$1IN7DPNxJDC0m260.MuYHeWTFfESFF.DGfrivMk/rLM09EqpsFTXe'
-};
+    // 国内城市数据（完整）
+    const chinaCityData = {
+      "北京市": ["北京市"], "上海市": ["上海市"], "天津市": ["天津市"], "重庆市": ["重庆市"],
+      "河北省": ["石家庄市","唐山市","秦皇岛市","邯郸市","邢台市","保定市","张家口市","承德市","沧州市","廊坊市","衡水市"],
+      "山西省": ["太原市","大同市","阳泉市","长治市","晋城市","朔州市","晋中市","运城市","忻州市","临汾市","吕梁市"],
+      "内蒙古": ["呼和浩特市","包头市","乌海市","赤峰市","通辽市","鄂尔多斯市","呼伦贝尔市","巴彦淖尔市","乌兰察布市"],
+      "辽宁省": ["沈阳市","大连市","鞍山市","抚顺市","本溪市","丹东市","锦州市","营口市","阜新市","辽阳市","盘锦市","铁岭市","朝阳市","葫芦岛市"],
+      "吉林省": ["长春市","吉林市","四平市","辽源市","通化市","白山市","松原市","白城市","延边州"],
+      "黑龙江省": ["哈尔滨市","齐齐哈尔市","鸡西市","鹤岗市","双鸭山市","大庆市","伊春市","佳木斯市","七台河市","牡丹江市","黑河市","绥化市"],
+      "江苏省": ["南京市","无锡市","徐州市","常州市","苏州市","南通市","连云港市","淮安市","盐城市","扬州市","镇江市","泰州市","宿迁市"],
+      "浙江省": ["杭州市","宁波市","温州市","嘉兴市","湖州市","绍兴市","金华市","衢州市","舟山市","台州市","丽水市"],
+      "安徽省": ["合肥市","芜湖市","蚌埠市","淮南市","马鞍山市","淮北市","铜陵市","安庆市","黄山市","滁州市","阜阳市","宿州市","六安市","亳州市","池州市","宣城市"],
+      "福建省": ["福州市","厦门市","莆田市","三明市","泉州市","漳州市","南平市","龙岩市","宁德市"],
+      "江西省": ["南昌市","景德镇市","萍乡市","九江市","新余市","鹰潭市","赣州市","吉安市","宜春市","抚州市","上饶市"],
+      "山东省": ["济南市","青岛市","淄博市","枣庄市","东营市","烟台市","潍坊市","济宁市","泰安市","威海市","日照市","临沂市","德州市","聊城市","滨州市","菏泽市"],
+      "河南省": ["郑州市","开封市","洛阳市","平顶山市","安阳市","鹤壁市","新乡市","焦作市","濮阳市","许昌市","漯河市","三门峡市","南阳市","商丘市","信阳市","周口市","驻马店市"],
+      "湖北省": ["武汉市","黄石市","十堰市","宜昌市","襄阳市","鄂州市","荆门市","孝感市","荆州市","黄冈市","咸宁市","随州市","恩施州"],
+      "湖南省": ["长沙市","株洲市","湘潭市","衡阳市","邵阳市","岳阳市","常德市","张家界市","益阳市","郴州市","永州市","怀化市","娄底市","湘西州"],
+      "广东省": ["广州市","韶关市","深圳市","珠海市","汕头市","佛山市","江门市","湛江市","茂名市","肇庆市","惠州市","梅州市","汕尾市","河源市","阳江市","清远市","东莞市","中山市","潮州市","揭阳市","云浮市"],
+      "广西": ["南宁市","柳州市","桂林市","梧州市","北海市","防城港市","钦州市","贵港市","玉林市","百色市","贺州市","河池市","来宾市","崇左市"],
+      "海南省": ["海口市","三亚市","三沙市","儋州市"],
+      "四川省": ["成都市","自贡市","攀枝花市","泸州市","德阳市","绵阳市","广元市","遂宁市","内江市","乐山市","南充市","眉山市","宜宾市","广安市","达州市","雅安市","巴中市","资阳市","阿坝州","甘孜州","凉山州"],
+      "贵州省": ["贵阳市","六盘水市","遵义市","安顺市","毕节市","铜仁市","黔西南州","黔东南州","黔南州"],
+      "云南省": ["昆明市","曲靖市","玉溪市","保山市","昭通市","丽江市","普洱市","临沧市","楚雄州","红河州","文山州","西双版纳州","大理州","德宏州","怒江州","迪庆州"],
+      "西藏": ["拉萨市","日喀则市","昌都市","林芝市","山南市","那曲市","阿里地区"],
+      "陕西省": ["西安市","铜川市","宝鸡市","咸阳市","渭南市","延安市","汉中市","榆林市","安康市","商洛市"],
+      "甘肃省": ["兰州市","嘉峪关市","金昌市","白银市","天水市","武威市","张掖市","平凉市","酒泉市","庆阳市","定西市","陇南市","临夏州","甘南州"],
+      "青海省": ["西宁市","海东市","海北州","黄南州","海南州","果洛州","玉树州","海西州"],
+      "宁夏": ["银川市","石嘴山市","吴忠市","固原市","中卫市"],
+      "新疆": ["乌鲁木齐市","克拉玛依市","吐鲁番市","哈密市","昌吉州","博尔塔拉州","巴音郭楞州","阿克苏地区","克孜勒苏州","喀什地区","和田地区","伊犁州","塔城地区","阿勒泰地区"]
+    };
 
-createApp({
-    setup() {
-        // --- 状态变量 ---
+    const internationalCityData = {
+      "巴西": ["圣保罗","里约热内卢","巴西利亚","萨尔瓦多","福塔莱萨","贝洛奥里藏特","玛瑙斯","库里蒂巴","累西腓","阿雷格里港"],
+      "阿根廷": ["布宜诺斯艾利斯","科尔多瓦","罗萨里奥","门多萨"],
+      "智利": ["圣地亚哥","瓦尔帕莱索","康塞普西翁"],
+      "秘鲁": ["利马","阿雷基帕","特鲁希略"],
+      "哥伦比亚": ["波哥大","麦德林","卡利"],
+      "墨西哥": ["墨西哥城","瓜达拉哈拉","蒙特雷"],
+      "埃及": ["开罗","亚历山大","吉萨"],
+      "埃塞俄比亚": ["亚的斯亚贝巴","德雷达瓦"],
+      "肯尼亚": ["内罗毕","蒙巴萨","基苏木"],
+      "尼日利亚": ["阿布贾","拉各斯","卡诺"],
+      "南非": ["比勒陀利亚","约翰内斯堡","开普敦","德班"],
+      "安哥拉": ["罗安达","本格拉"],
+      "印度尼西亚": ["雅加达","泗水","万隆","棉兰"],
+      "泰国": ["曼谷","清迈","芭提雅","普吉"],
+      "越南": ["河内","胡志明市","海防","岘港"],
+      "马来西亚": ["吉隆坡","槟城","新山","古晋"],
+      "菲律宾": ["马尼拉","宿务","达沃"],
+      "印度": ["德里","孟买","加尔各答","班加罗尔"],
+      "巴基斯坦": ["伊斯兰堡","卡拉奇","拉合尔"],
+      "哈萨克斯坦": ["阿斯塔纳","阿拉木图"],
+      "乌兹别克斯坦": ["塔什干","撒马尔罕"],
+      "沙特阿拉伯": ["利雅得","吉达","麦加"],
+      "阿联酋": ["阿布扎比","迪拜","沙迦"],
+      "伊朗": ["德黑兰","马什哈德","伊斯法罕"],
+      "土耳其": ["安卡拉","伊斯坦布尔","伊兹密尔"],
+      "俄罗斯": ["莫斯科","圣彼得堡","新西伯利亚"],
+      "德国": ["柏林","汉堡","慕尼黑","法兰克福"],
+      "法国": ["巴黎","马赛","里昂"],
+      "意大利": ["罗马","米兰","那不勒斯"],
+      "西班牙": ["马德里","巴塞罗那","瓦伦西亚"],
+      "荷兰": ["阿姆斯特丹","鹿特丹"],
+      "波兰": ["华沙","克拉科夫"],
+      "希腊": ["雅典","塞萨洛尼基"],
+      "新加坡": ["新加坡"],
+      "缅甸": ["内比都","仰光","曼德勒"],
+      "柬埔寨": ["金边","暹粒"],
+      "老挝": ["万象","琅勃拉邦"],
+      "孟加拉国": ["达卡","吉大港"],
+      "斯里兰卡": ["科伦坡","康提"]
+    };
+
+    const app = createApp({
+      setup() {
+        const subsidyOptions = [220, 260, 290, 320, 340, 450];
         const logs = ref([]);
+        const templates = ref([]);
         const showModal = ref(false);
-        const isReadOnly = ref(false);
-        const syncInfo = reactive({ status: 'success', text: '已同步', lastTime: '' });
+        const editingId = ref(null);
+        const filter = reactive({ startDate: '', endDate: '', keyword: '' });
+        const selectedTemplateId = ref('');
+        const newTemplateName = ref('');
+        const isReadonlyMode = ref(false);
+        const showExportMenu = ref(false);
+        const selectedProject = ref('');
+        const chartPeriod = ref('all');
         
-        const filters = reactive({ start: '', end: '', search: '' });
-        const sections = reactive({ base: true, loc: true, transport: false, meal: false, contact: false });
-
-        const form = reactive({
-            id: null, startDate: '', endDate: '', days: 0,
-            hotelName: '', hotelPrice: 0, roommateCount: 1, hotelAA: false,
-            regionType: 'domestic', province: '', city: '', customLocation: '',
-            projectName: '', workContent: '',
-            subsidyType: 'preset', subsidyAmount: 220, customSubsidy: 0,
-            contacts: [], transports: [], meals: [], entertains: [], advances: [],
-            reimbursed: false
+        // 云同步状态
+        const syncStatus = ref('idle'); // 'syncing', 'success', 'error'
+        const lastSyncTime = ref('');
+        const syncIcon = computed(() => {
+          if (syncStatus.value === 'syncing') return 'fa-cloud-upload-alt syncing';
+          if (syncStatus.value === 'success') return 'fa-cloud-check';
+          if (syncStatus.value === 'error') return 'fa-cloud-exclamation';
+          return 'fa-cloud';
         });
-
-        // --- 静态数据 ---
-        const constants = {
-            provinces: ['北京', '上海', '广东', '江苏', '浙江', '湖北', '四川', '巴西', '肯尼亚', '印尼']
-        };
-
-        // --- 计算属性 ---
-        const filteredLogs = computed(() => {
-            return logs.value.filter(log => {
-                const matchSearch = !filters.search || 
-                    log.projectName.includes(filters.search) || 
-                    log.hotelName.includes(filters.search) ||
-                    log.contacts.some(c => c.name.includes(filters.search));
-                const matchStart = !filters.start || dayjs(log.startDate).isAfter(dayjs(filters.start).subtract(1, 'day'));
-                const matchEnd = !filters.end || dayjs(log.endDate).isBefore(dayjs(filters.end).add(1, 'day'));
-                return matchSearch && matchStart && matchEnd;
-            }).sort((a, b) => dayjs(b.startDate).unix() - dayjs(a.startDate).unix());
+        const syncColor = computed(() => {
+          if (syncStatus.value === 'success') return '#2e8b57';
+          if (syncStatus.value === 'error') return '#b85c5c';
+          return '#5e4b8b';
         });
-
-        const stats = computed(() => {
-            let unreimbursed = 0, reimbursed = 0;
-            filteredLogs.value.forEach(l => {
-                if(l.reimbursed) reimbursed += l.reimbursementTotal;
-                else unreimbursed += l.reimbursementTotal;
+        const syncTooltip = computed(() => {
+          if (syncStatus.value === 'syncing') return '同步中...';
+          if (syncStatus.value === 'success') return '已同步';
+          if (syncStatus.value === 'error') return '同步失败';
+          return '等待同步';
+        });
+        
+        const expandedGroups = reactive({});
+        const collapsed = reactive({ transport: false, meal: false, entertain: false, advance: false, contact: false });
+        
+        const getEmptyForm = () => ({
+          startDate: '', endDate: '', hotelName: '', hotelPrice: 0, roommateCount: 1, hotelAA: false,
+          regionType: 'domestic', province: '', city: '', customLocation: '', projectName: '', workContent: '',
+          subsidyType: 'preset', subsidyAmount: 260, customSubsidy: '',
+          contacts: [{ name: '', contact: '', project: '' }],
+          transports: [{ type: '高铁', from: '', to: '', via: '', departureTime: '', arrivalTime: '', price: 0 }],
+          meals: [{ mealType: '早餐', amount: 0, peopleCount: 1, isAA: false, payer: '' }],
+          entertains: [{ guests: '', location: '', time: '', amount: 0, description: '' }],
+          advances: [{ time: '', description: '', amount: 0, repaid: false }],
+          reimbursed: false,
+        });
+        const form = reactive(getEmptyForm());
+        
+        const computedDays = computed(() => {
+          if(!form.startDate||!form.endDate) return 0;
+          return dayjs(form.endDate).diff(dayjs(form.startDate),'day')+1;
+        });
+        const transportTotal = computed(()=> form.transports.reduce((s,t)=>s+(+t.price||0),0));
+        const mealTotal = computed(()=> form.meals.reduce((s,m)=>s+(+m.amount||0),0));
+        const entertainTotal = computed(()=> form.entertains.reduce((s,e)=>s+(+e.amount||0),0));
+        const advanceTotal = computed(()=> form.advances.reduce((s,a)=>s+(+a.amount||0),0));
+        const currentSubsidy = computed(() => form.subsidyType === 'preset' ? form.subsidyAmount : (parseFloat(form.customSubsidy) || 0));
+        
+        const personalMealCost = computed(() => form.meals.reduce((s, m) => {
+          if (!m.isAA) return s;
+          const perPerson = m.amount / (m.peopleCount || 1);
+          if (m.payer === '自己' || m.payer === '本人') return s + perPerson;
+          return s;
+        }, 0));
+        const personalHotelCost = computed(() => {
+          if (!form.hotelAA || form.roommateCount <= 1) return 0;
+          return (form.hotelPrice || 0) * computedDays.value / form.roommateCount;
+        });
+        const computedPersonalTotal = computed(() => personalHotelCost.value + personalMealCost.value);
+        const computedReimbursement = computed(() => 
+          (currentSubsidy.value * computedDays.value) 
+          + transportTotal.value 
+          + (mealTotal.value - personalMealCost.value) 
+          + entertainTotal.value 
+          + advanceTotal.value
+        );
+        
+        const provinceOptions = computed(() => form.regionType === 'domestic' ? Object.keys(chinaCityData) : Object.keys(internationalCityData));
+        const cityOptions = computed(() => form.regionType === 'domestic' ? (chinaCityData[form.province] || []) : (internationalCityData[form.province] || []));
+        const onProvinceInput = () => { form.city = ''; };
+        
+        const filteredLogs = computed(()=> {
+          let result = logs.value;
+          if (filter.startDate) result = result.filter(l => l.startDate >= filter.startDate);
+          if (filter.endDate) result = result.filter(l => l.endDate <= filter.endDate);
+          if (filter.keyword) {
+            const kw = filter.keyword.toLowerCase();
+            result = result.filter(l => 
+              (l.hotelName||'').toLowerCase().includes(kw) ||
+              (l.projectName||'').toLowerCase().includes(kw) ||
+              (l.workContent||'').toLowerCase().includes(kw) ||
+              (l.contacts||[]).some(c => (c.name||'').toLowerCase().includes(kw) || (c.contact||'').toLowerCase().includes(kw))
+            );
+          }
+          if (selectedProject.value) {
+            result = result.filter(l => l.projectName === selectedProject.value);
+          }
+          return result;
+        });
+        const projectList = computed(() => [...new Set(logs.value.map(l => l.projectName).filter(Boolean))]);
+        const projectStats = computed(()=> {
+          const map = {};
+          logs.value.forEach(l=>{ if(l.projectName) map[l.projectName] = (map[l.projectName]||0) + (l.reimbursementTotal||0); });
+          return map;
+        });
+        
+        const contactGroups = computed(() => {
+          const groups = {};
+          logs.value.forEach(log => {
+            const proj = log.projectName || '未命名项目';
+            if (!groups[proj]) groups[proj] = [];
+            (log.contacts || []).forEach(c => {
+              if (c.name || c.contact) groups[proj].push({ ...c, project: proj });
             });
-            return { unreimbursed, reimbursed };
+          });
+          Object.keys(groups).forEach(proj => { if (!(proj in expandedGroups)) expandedGroups[proj] = true; });
+          return Object.entries(groups).map(([proj, items]) => ({ proj, items }));
         });
-
-        const currentTotal = computed(() => {
-            // 实现需求第 7 点的特殊计算逻辑
-            const days = dayjs(form.endDate).diff(dayjs(form.startDate), 'day') + 1;
-            const sub = (form.subsidyType === 'preset' ? form.subsidyAmount : form.customSubsidy) * days;
-            const trans = form.transports.reduce((sum, t) => sum + (t.price || 0), 0);
-            
-            // 用餐 AA
-            const personalMeal = form.meals.reduce((sum, m) => {
-                if(m.isAA && (m.payer === '自己' || m.payer === '本人')) {
-                    return sum + ((m.amount || 0) / (m.peopleCount || 1));
-                }
-                return sum;
-            }, 0);
-            
-            // 住宿 AA
-            let personalHotel = 0;
-            if(form.hotelAA && form.roommateCount > 1) {
-                personalHotel = (form.hotelPrice * days) / form.roommateCount;
-            }
-
-            const totalEntertain = form.entertains.reduce((sum, e) => sum + (e.amount || 0), 0);
-            const totalAdvance = form.advances.reduce((sum, a) => sum + (a.amount || 0), 0);
-            const totalMeal = form.meals.reduce((sum, m) => sum + (m.amount || 0), 0);
-
-            return {
-                reimburse: sub + trans + (totalMeal - personalMeal) + totalEntertain + totalAdvance,
-                personal: personalHotel + personalMeal,
-                sub, trans, totalMeal, totalEntertain, totalAdvance, personalHotel, personalMeal
-            };
-        });
-
-        const groupedContacts = computed(() => {
-            const groups = {};
-            logs.value.forEach(log => {
-                log.contacts.forEach(c => {
-                    const p = c.project || log.projectName;
-                    if(!groups[p]) groups[p] = [];
-                    if(!groups[p].find(item => item.contact === c.contact)) groups[p].push(c);
-                });
+        const toggleContactGroup = (proj) => { expandedGroups[proj] = !expandedGroups[proj]; };
+        
+        const totalPersonalHotelAA = computed(()=> filteredLogs.value.reduce((s,l)=> s + (l.personalHotelCost||0), 0));
+        const totalPersonalMealAA = computed(()=> filteredLogs.value.reduce((s,l)=> s + (l.personalMealCost||0), 0));
+        const totalPersonalExpense = computed(()=> totalPersonalHotelAA.value + totalPersonalMealAA.value);
+        const totalReimbursement = computed(()=> filteredLogs.value.reduce((s,l)=> s + (l.reimbursementTotal||0), 0));
+        const unreimbursedTotal = computed(()=> filteredLogs.value.filter(l=>!l.reimbursed).reduce((s,l)=> s + (l.reimbursementTotal||0), 0));
+        const reimbursedTotal = computed(()=> filteredLogs.value.filter(l=>l.reimbursed).reduce((s,l)=> s + (l.reimbursementTotal||0), 0));
+        
+        // 云同步函数
+        const syncToCloud = async () => {
+          syncStatus.value = 'syncing';
+          try {
+            await fetch(CONFIG.BIN_URL, {
+              method: 'PUT',
+              headers: CONFIG.HEADERS,
+              body: JSON.stringify(logs.value)
             });
-            return groups;
-        });
-
-        // --- 方法 ---
-        const calcDays = () => {
-            if(form.startDate && form.endDate) {
-                form.days = dayjs(form.endDate).diff(dayjs(form.startDate), 'day') + 1;
-            }
+            syncStatus.value = 'success';
+            lastSyncTime.value = dayjs().format('HH:mm:ss');
+          } catch (e) {
+            console.warn('云同步失败', e);
+            syncStatus.value = 'error';
+          }
         };
-
-        const addTransport = () => {
-            form.transports.push({ type: '高铁', price: 0, from: '', to: '', via: '', departureTime: '', arrivalTime: '' });
-        };
-
         const loadFromCloud = async () => {
-            syncInfo.status = 'syncing';
-            syncInfo.text = '同步中...';
-            try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${CLOUD_CONFIG.BIN_ID}/latest`, {
-                    headers: { 'X-Master-Key': CLOUD_CONFIG.API_KEY }
-                });
-                const data = await res.json();
-                logs.value = data.record.logs || [];
-                localStorage.setItem('chengtong_logs', JSON.stringify(logs.value));
-                syncInfo.status = 'success';
-                syncInfo.text = '云端同步成功';
-                syncInfo.lastTime = dayjs().format('HH:mm:ss');
-                updateCharts();
-            } catch (e) {
-                syncInfo.status = 'error';
-                syncInfo.text = '同步失败，使用本地缓存';
-                const local = localStorage.getItem('chengtong_logs');
-                if(local) logs.value = JSON.parse(local);
-            }
+          try {
+            const res = await fetch(CONFIG.BIN_URL, { headers: CONFIG.HEADERS });
+            const data = await res.json();
+            if (data.record) logs.value = data.record;
+            syncStatus.value = 'success';
+            lastSyncTime.value = dayjs().format('HH:mm:ss');
+          } catch (e) { console.warn('加载云端数据失败'); syncStatus.value = 'error'; }
         };
-
-        const saveToCloud = async () => {
-            syncInfo.status = 'syncing';
-            try {
-                await fetch(`https://api.jsonbin.io/v3/b/${CLOUD_CONFIG.BIN_ID}`, {
-                    method: 'PUT',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': CLOUD_CONFIG.API_KEY 
-                    },
-                    body: JSON.stringify({ logs: logs.value })
-                });
-                syncInfo.status = 'success';
-                syncInfo.lastTime = dayjs().format('HH:mm:ss');
-                localStorage.setItem('chengtong_logs', JSON.stringify(logs.value));
-                updateCharts();
-            } catch (e) {
-                syncInfo.status = 'error';
-                alert('云端保存失败，请检查网络');
-            }
+        
+        const loadTemplates = ()=> { const saved=localStorage.getItem('log_templates'); if(saved) templates.value=JSON.parse(saved); };
+        const saveAsTemplate = ()=>{
+          if(!newTemplateName.value) return alert('输入模板名');
+          templates.value.push({ id: Date.now(), name: newTemplateName.value, data: JSON.parse(JSON.stringify(form)) });
+          localStorage.setItem('log_templates', JSON.stringify(templates.value));
+          newTemplateName.value=''; alert('模板已保存');
         };
-
-        const saveLog = () => {
-            const calc = currentTotal.value;
-            const logEntry = {
-                ...JSON.parse(JSON.stringify(form)),
-                id: form.id || (Date.now() + '-' + Math.random().toString(36).substr(2, 5)),
-                days: dayjs(form.endDate).diff(dayjs(form.startDate), 'day') + 1,
-                subsidyTotal: calc.sub,
-                totalTransport: calc.trans,
-                totalMeal: calc.totalMeal,
-                totalEntertain: calc.totalEntertain,
-                totalAdvance: calc.totalAdvance,
-                reimbursementTotal: calc.reimburse,
-                personalHotelCost: calc.personalHotel,
-                personalMealCost: calc.personalMeal,
-                personalTotal: calc.personal
-            };
-
-            if(form.id) {
-                const idx = logs.value.findIndex(l => l.id === form.id);
-                logs.value[idx] = logEntry;
-            } else {
-                logs.value.push(logEntry);
-            }
-            saveToCloud();
-            closeModal();
+        const loadTemplate = ()=>{
+          const t = templates.value.find(t=>t.id==selectedTemplateId.value);
+          if(t){ Object.assign(form, JSON.parse(JSON.stringify(t.data))); selectedTemplateId.value=''; }
         };
-
-        const deleteLog = (id) => {
-            if(confirm('确定删除此记录吗？')) {
-                logs.value = logs.value.filter(l => l.id !== id);
-                saveToCloud();
-            }
+        
+        const openNewLogModal = ()=> { editingId.value=null; Object.assign(form, getEmptyForm()); showModal.value=true; };
+        const editLog = (log)=> { editingId.value=log.id; Object.assign(form, JSON.parse(JSON.stringify(log))); showModal.value=true; };
+        const closeModal = ()=> { showModal.value=false; };
+        const saveLog = ()=>{
+          const data = {
+            ...form, id: editingId.value || Date.now()+'-'+Math.random().toString(36), days: computedDays.value,
+            subsidyTotal: currentSubsidy.value * computedDays.value, totalTransport: transportTotal.value,
+            totalMeal: mealTotal.value, totalEntertain: entertainTotal.value, totalAdvance: advanceTotal.value,
+            reimbursementTotal: computedReimbursement.value,
+            personalHotelCost: personalHotelCost.value, personalMealCost: personalMealCost.value,
+            personalTotal: computedPersonalTotal.value,
+          };
+          if(editingId.value) { const idx=logs.value.findIndex(l=>l.id===editingId.value); if(idx!==-1) logs.value[idx]=data; }
+          else logs.value.push(data);
+          localStorage.setItem('chengtong_logs', JSON.stringify(logs.value));
+          syncToCloud();
+          closeModal(); renderCharts();
         };
-
-        const openModal = (target = null) => {
-            if(target) {
-                Object.assign(form, JSON.parse(JSON.stringify(target)));
-            } else {
-                Object.assign(form, {
-                    id: null, startDate: '', endDate: '', days: 0, hotelName: '', hotelPrice: 0, roommateCount: 1,
-                    hotelAA: false, regionType: 'domestic', province: '', city: '', customLocation: '',
-                    projectName: '', workContent: '', subsidyType: 'preset', subsidyAmount: 220, customSubsidy: 0,
-                    contacts: [], transports: [], meals: [], entertains: [], advances: [], reimbursed: false
-                });
-            }
-            showModal.value = true;
-        };
-
-        const closeModal = () => showModal.value = false;
-        const resetFilters = () => { filters.start = ''; filters.end = ''; filters.search = ''; };
-
-        // --- 导出逻辑 ---
-        const exportExcel = () => {
-            const wb = XLSX.utils.book_new();
-            
-            // 汇总表
-            const summaryData = filteredLogs.value.map(l => ({
-                '项目名称': l.projectName,
-                '日期': `${l.startDate}至${l.endDate}`,
-                '天数': l.days,
-                '交通总额': l.totalTransport,
-                '报销总额': l.reimbursementTotal,
-                '状态': l.reimbursed ? '已报销' : '待报销'
+        const deleteLog = (id)=> { logs.value=logs.value.filter(l=>l.id!==id); syncToCloud(); renderCharts(); };
+        const syncWithStatus = () => syncToCloud();
+        
+        const addContact = ()=> { form.contacts.push({ name: '', contact: '', project: form.projectName || '' }); };
+        const addTransport = ()=> form.transports.push({ type:'高铁', from:'', to:'', via:'', departureTime:'', arrivalTime:'', price:0 });
+        const addMeal = ()=> form.meals.push({ mealType:'午餐', amount:0, peopleCount:1, isAA:false, payer:'' });
+        const addEntertain = ()=> form.entertains.push({ guests:'', location:'', time:'', amount:0, description:'' });
+        const addAdvance = ()=> form.advances.push({ time:'', description:'', amount:0, repaid:false });
+        
+        const exportData = (type) => {
+          if (type === 'excel') {
+            const summary = filteredLogs.value.map(l => ({
+              '项目': l.projectName, '日期': `${l.startDate}~${l.endDate}`, '酒店': l.hotelName,
+              '交通': l.totalTransport, '用餐': l.totalMeal, '招待': l.totalEntertain, '垫资': l.totalAdvance,
+              '补贴': l.subsidyTotal, '报销总额': l.reimbursementTotal, '个人支出': l.personalTotal, '已报销': l.reimbursed?'是':'否'
             }));
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryData), "汇总");
-            
-            XLSX.writeFile(wb, `出差报销单_${dayjs().format('YYYYMMDD')}.xlsx`);
+            const transportDetails = filteredLogs.value.flatMap(l => (l.transports||[]).map(t => ({ ...t, projectName: l.projectName, date: l.startDate })));
+            const mealDetails = filteredLogs.value.flatMap(l => (l.meals||[]).map(m => ({ ...m, projectName: l.projectName, date: l.startDate })));
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summary), '汇总');
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(transportDetails), '交通明细');
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(mealDetails), '用餐明细');
+            XLSX.writeFile(wb, `成通出差日志_${dayjs().format('YYYYMMDD')}.xlsx`);
+          } else if (type === 'word') {
+            let html = `<h2>成通公司出差日志</h2><table border="1" cellpadding="5"><tr><th>项目</th><th>日期</th><th>酒店</th><th>报销总额</th><th>已报销</th></tr>`;
+            filteredLogs.value.forEach(l => { html += `<tr><td>${l.projectName||''}</td><td>${l.startDate}~${l.endDate}</td><td>${l.hotelName||''}</td><td>${l.reimbursementTotal}</td><td>${l.reimbursed?'是':'否'}</td></tr>`; });
+            html += `</table>`;
+            const blob = new Blob([html], { type: 'application/msword' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `出差报告_${dayjs().format('YYYYMMDD')}.doc`; a.click();
+          } else if (type === 'pdf') { window.print(); }
         };
-
-        // --- 图表逻辑 ---
-        let sankeyInstance, barInstance;
-        const updateCharts = () => {
-            nextTick(() => {
-                if(!sankeyInstance) sankeyInstance = echarts.init(document.getElementById('sankeyChart'));
-                if(!barInstance) barInstance = echarts.init(document.getElementById('barChart'));
-
-                // 柱状图：按月统计报销额
-                const months = {};
+        
+        const shareReadonlyLink = ()=>{
+          if(filteredLogs.value.length===0) return alert('无日志可分享');
+          const encoded = btoa(encodeURIComponent(JSON.stringify(filteredLogs.value)));
+          const url = `${location.origin}${location.pathname}?share=${encoded}`;
+          navigator.clipboard?.writeText(url).then(()=> alert('只读链接已复制')) || prompt('复制链接', url);
+        };
+        const parseShareParam = ()=>{
+          const params = new URLSearchParams(location.search);
+          const share = params.get('share');
+          if(share){
+            try{ logs.value = JSON.parse(decodeURIComponent(atob(share))); isReadonlyMode.value = true; }catch(e){}
+          }
+        };
+        const exitReadonlyMode = ()=>{ isReadonlyMode.value = false; loadFromCloud(); history.replaceState(null,'',location.pathname); renderCharts(); };
+        const exportBackup = ()=>{ /* 已移除 */ };
+        const importBackup = ()=>{ /* 已移除 */ };
+        const clearFilter = ()=> { filter.startDate=''; filter.endDate=''; filter.keyword=''; selectedProject.value=''; };
+        
+        let sankeyChart, barChart;
+        const renderCharts = ()=>{
+          nextTick(()=>{
+            const sankeyDom = document.getElementById('sankeyChart');
+            const barDom = document.getElementById('barChart');
+            if(sankeyDom){
+              if(!sankeyChart) sankeyChart = echarts.init(sankeyDom);
+              const t1 = filteredLogs.value.reduce((s,l)=>s+(l.totalTransport||0),0);
+              const t2 = filteredLogs.value.reduce((s,l)=>s+(l.totalMeal||0),0);
+              const t3 = filteredLogs.value.reduce((s,l)=>s+(l.totalEntertain||0),0);
+              const t4 = filteredLogs.value.reduce((s,l)=>s+(l.totalAdvance||0),0);
+              const t5 = filteredLogs.value.reduce((s,l)=>s+(l.subsidyTotal||0),0);
+              sankeyChart.setOption({
+                series: { type:'sankey', data:[{name:'总支出'},{name:'交通'},{name:'用餐'},{name:'招待'},{name:'垫资'},{name:'补贴'}],
+                  links:[ {source:'总支出',target:'交通',value:t1},{source:'总支出',target:'用餐',value:t2},{source:'总支出',target:'招待',value:t3},{source:'总支出',target:'垫资',value:t4},{source:'总支出',target:'补贴',value:t5} ]
+                }
+              });
+            }
+            if(barDom){
+              if(!barChart) barChart = echarts.init(barDom);
+              let barData = [];
+              if (chartPeriod.value === 'all') {
+                barData = filteredLogs.value.map(l => ({ name: l.projectName||'未知', value: l.reimbursementTotal }));
+              } else {
+                const groups = {};
                 filteredLogs.value.forEach(l => {
-                    const m = l.startDate.substring(0, 7);
-                    months[m] = (months[m] || 0) + l.reimbursementTotal;
+                  let key;
+                  if (chartPeriod.value === 'month') key = l.startDate?.substring(0,7);
+                  else key = `${l.startDate?.substring(0,4)}-Q${Math.ceil(parseInt(l.startDate?.substring(5,7)||1)/3)}`;
+                  if (!groups[key]) groups[key] = 0;
+                  groups[key] += l.reimbursementTotal;
                 });
-                
-                barInstance.setOption({
-                    title: { text: '报销趋势', textStyle: { color: '#fff' } },
-                    xAxis: { type: 'category', data: Object.keys(months) },
-                    yAxis: { type: 'value' },
-                    series: [{ data: Object.values(months), type: 'bar', itemStyle: { color: '#6240b0' } }]
-                });
-            });
+                barData = Object.entries(groups).map(([k,v]) => ({ name: k, value: v }));
+              }
+              barChart.setOption({
+                xAxis:{type:'category',data: barData.map(d=>d.name)},
+                yAxis:{}, series:[{type:'bar',data: barData.map(d=>d.value), itemStyle:{color:'#6240b0'}}]
+              });
+            }
+          });
         };
-
-        onMounted(() => {
-            loadFromCloud();
-            window.addEventListener('resize', () => {
-                sankeyInstance?.resize();
-                barInstance?.resize();
-            });
+        const renderBarChart = ()=> renderCharts();
+        
+        onMounted(async ()=>{
+          loadTemplates();
+          parseShareParam();
+          if(!isReadonlyMode.value) await loadFromCloud();
+          renderCharts();
+          window.dayjs = dayjs;
         });
-
+        watch([filteredLogs, chartPeriod], ()=> renderCharts(), { deep: true });
+        
         return {
-            logs, filteredLogs, filters, showModal, syncInfo, constants, form, stats,
-            sections, currentTotal, groupedContacts, isReadOnly,
-            openModal, closeModal, saveLog, deleteLog, calcDays, addTransport, resetFilters, exportExcel, saveToCloud
+          logs, filteredLogs, filter, clearFilter, selectedProject, projectList,
+          showModal, editingId, form, subsidyOptions, computedDays, transportTotal, mealTotal, computedReimbursement, computedPersonalTotal,
+          addContact, addTransport, addMeal, addEntertain, addAdvance, openNewLogModal, editLog, deleteLog, closeModal, saveLog,
+          syncStatus, syncIcon, syncColor, syncTooltip, lastSyncTime, syncWithStatus,
+          projectStats, contactGroups, expandedGroups, toggleContactGroup,
+          templates, selectedTemplateId, newTemplateName, saveAsTemplate, loadTemplate,
+          exportData, showExportMenu, shareReadonlyLink, isReadonlyMode, exitReadonlyMode,
+          provinceOptions, cityOptions, onProvinceInput,
+          totalPersonalHotelAA, totalPersonalMealAA, totalPersonalExpense,
+          totalReimbursement, unreimbursedTotal, reimbursedTotal,
+          collapsed, chartPeriod, renderBarChart,
+          dayjs
         };
-    }
-}).mount('#app');
+      }
+    });
+    app.mount('#app');
+  })();
 </script>
 </body>
 </html>
