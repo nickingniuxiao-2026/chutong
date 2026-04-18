@@ -202,7 +202,8 @@ textarea{resize:vertical;min-height:60px}
   background:linear-gradient(180deg,transparent,#4a90ff50,transparent);
 }
 .logo-sysname{
-  font-size:.68rem;color:var(--text-muted);font-weight:400;letter-spacing:.04em;
+  font-size:.85rem;color:var(--text-muted);font-weight:500;letter-spacing:.06em;
+  text-shadow:0 0 12px #f0b42915;
 }
 .header-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .sync-indicator{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text-muted);padding:5px 10px;border-radius:var(--radius-sm);background:var(--glass);border:1px solid var(--glass-border)}
@@ -364,7 +365,15 @@ textarea{resize:vertical;min-height:60px}
   cursor:pointer;user-select:none;transition:background var(--transition);
 }
 .contact-group-header:hover{background:#ffffff14}
-.contact-group-name{font-size:.85rem;font-weight:600}
+.contact-group-name{font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:6px}
+.contact-group-name::before{
+  content:'';display:inline-block;width:0;height:0;
+  border-left:5px solid var(--text-muted);border-top:4px solid transparent;border-bottom:4px solid transparent;
+  transition:transform .2s ease;
+}
+.contact-group-header.expanded .contact-group-name::before{
+  transform:rotate(90deg);
+}
 .contact-item{
   display:flex;align-items:center;justify-content:space-between;
   padding:6px 10px;border-bottom:1px solid #ffffff08;font-size:.82rem;
@@ -390,11 +399,6 @@ textarea{resize:vertical;min-height:60px}
 .hint{font-size:.78rem;color:var(--text-muted);padding:4px 8px;background:#ffffff06;border-radius:4px}
 .hint.warn{color:var(--warning)}
 .hint.info{color:var(--info)}
-
-/* ===== 国内/国外切换 ===== */
-.region-tabs{display:flex;gap:4px;background:#ffffff08;border-radius:var(--radius-sm);padding:3px}
-.region-tab{flex:1;text-align:center;padding:5px 8px;border-radius:6px;font-size:.82rem;cursor:pointer;transition:all var(--transition);color:var(--text-muted)}
-.region-tab.active{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff}
 
 /* ===== 空状态 ===== */
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;color:var(--text-muted);gap:10px}
@@ -439,7 +443,7 @@ textarea{resize:vertical;min-height:60px}
   .main-layout{padding:12px;gap:12px}
 
   /* ===== 搜索栏 - 全部单列 ===== */
-  .search-bar{grid-template-columns:1fr;gap:6px}
+  .search-bar{grid-template-columns:1fr 1fr auto !important;gap:6px}
   .search-bar input,.search-bar select{font-size:16px !important;padding:10px 12px !important}
 
   /* ===== 日志卡片 ===== */
@@ -538,8 +542,53 @@ textarea{resize:vertical;min-height:60px}
 .mt-8{margin-top:8px}
 .mb-8{margin-bottom:8px}
 
+/* ===== 个人记账卡片 ===== */
+.expense-summary-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.expense-cat{
+  background:#ffffff08;border:1px solid var(--glass-border);border-radius:10px;
+  padding:10px 8px;text-align:center;
+  transition:all var(--transition);
+}
+.expense-cat:hover{background:#ffffff12;border-color:#6240b050}
+.expense-cat-icon{font-size:1.3rem;margin-bottom:4px}
+.expense-cat-label{font-size:.72rem;color:var(--text-muted);margin-bottom:2px}
+.expense-cat-val{font-size:.92rem;font-weight:700;color:var(--text)}
+@media(max-width:640px){
+  .expense-summary-grid{grid-template-columns:1fr !important;gap:8px}
+}
+
+/* ===== 金额脱敏 ===== */
+.amount-masked{color:var(--text-muted);letter-spacing:.15em;font-size:.85em}
+
+/* ===== 工作日志列表 ===== */
+.worklog-list{max-height:360px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-bottom:16px}
+.worklog-item{background:#ffffff08;border:1px solid var(--glass-border);border-radius:var(--radius-sm);padding:10px 12px;transition:all var(--transition)}
+.worklog-item:hover{background:#ffffff12;border-color:#6240b040}
+.worklog-item-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.worklog-item-date{display:flex;align-items:center;gap:6px}
+.worklog-date-badge{font-size:.75rem;color:var(--gold);font-weight:600;background:#f0b42915;padding:2px 8px;border-radius:4px}
+.worklog-type-badge{font-size:.7rem;color:var(--primary-light);background:#6240b025;padding:2px 8px;border-radius:4px}
+.worklog-item-actions{display:flex;gap:4px}
+.worklog-item-content{font-size:.82rem;color:var(--text);line-height:1.5;margin-bottom:4px}
+.worklog-item-meta{display:flex;gap:10px;font-size:.72rem;color:var(--text-dim)}
+@media(max-width:640px){
+  .worklog-list{max-height:280px}
+}
+
 /* ===== 移动端悬浮新建按钮 (桌面隐藏) ===== */
 .fab-create{display:none}
+
+/* ===== 综合Tab模块 ===== */
+.tab-bar{display:flex;gap:2px;background:#ffffff08;border-radius:var(--radius-sm);padding:3px;margin-bottom:12px;flex-wrap:wrap}
+.tab-item{
+  flex:1;text-align:center;padding:7px 6px;border-radius:6px;
+  font-size:.78rem;cursor:pointer;transition:all var(--transition);
+  color:var(--text-muted);white-space:nowrap;font-weight:500;
+}
+.tab-item:hover{background:#ffffff10}
+.tab-item.active{background:var(--primary);color:#fff;font-weight:600}
+.tab-item .tab-count{font-size:.65rem;opacity:.7;margin-left:3px}
+.tab-content{min-height:120px}
 @media(max-width:640px){
   .fab-create{
     display:flex;align-items:center;justify-content:center;
@@ -613,6 +662,9 @@ textarea{resize:vertical;min-height:60px}
       <div style="display:flex;align-items:center;gap:8px">
         <h1 style="font-size:1.1rem;font-weight:700;color:#fff">出差日志</h1>
         <span class="badge badge-primary">{{ filteredLogs.length }} 条</span>
+        <button class="btn btn-ghost btn-sm" @click="hideAmounts=!hideAmounts" :title="hideAmounts?'显示金额':'隐藏金额'" style="font-size:.78rem;padding:4px 8px">
+          {{ hideAmounts?'🔓':'🔒' }} {{ hideAmounts?'显示':'隐藏' }}
+        </button>
       </div>
       <button v-if="!isReadOnly" class="btn btn-primary btn-sm" @click="openCreate">
         ✚ 新建出差
@@ -621,7 +673,7 @@ textarea{resize:vertical;min-height:60px}
 
     <!-- 搜索过滤 -->
     <div class="card" style="padding:12px">
-      <div class="search-bar">
+      <div class="search-bar" style="grid-template-columns:1fr 1fr auto 1fr;align-items:end">
         <div class="form-group">
           <label class="form-label">开始日期</label>
           <input type="date" v-model="filter.dateFrom">
@@ -630,12 +682,12 @@ textarea{resize:vertical;min-height:60px}
           <label class="form-label">结束日期</label>
           <input type="date" v-model="filter.dateTo">
         </div>
+        <div style="display:flex;align-items:flex-end;padding-bottom:1px">
+          <button class="btn btn-ghost btn-sm" @click="resetFilter">重置</button>
+        </div>
         <div class="form-group">
           <label class="form-label">关键词搜索</label>
           <input type="text" v-model="filter.keyword" placeholder="酒店/项目/内容/联系人…">
-        </div>
-        <div style="display:flex;align-items:flex-end">
-          <button class="btn btn-ghost btn-sm" @click="resetFilter">重置</button>
         </div>
       </div>
       <div class="filter-tags" v-if="projectTags.length">
@@ -660,12 +712,10 @@ textarea{resize:vertical;min-height:60px}
             <div>
               <div class="log-card-title">
                 {{ log.hotelName || '(未填酒店)' }}
-                <span v-if="log.regionType==='international'" class="badge badge-info" style="font-size:.7rem;margin-left:6px">国际</span>
               </div>
               <div class="log-card-sub">
                 {{ log.projectName || '(未填项目)' }} &nbsp;|&nbsp;
                 {{ log.startDate }} ~ {{ log.endDate }} &nbsp;({{ log.days }}天)
-                <span v-if="log.city||log.province">&nbsp;|&nbsp;{{ log.province }}{{ log.city }}</span>
               </div>
             </div>
             <div class="log-card-actions" v-if="!isReadOnly">
@@ -674,19 +724,19 @@ textarea{resize:vertical;min-height:60px}
             </div>
           </div>
           <div class="log-card-amounts">
-            <div class="amount-item"><span class="label">补贴</span><span class="val">¥{{ log.subsidyTotal||0 }}</span></div>
-            <div class="amount-item"><span class="label">交通</span><span class="val">¥{{ log.totalTransport||0 }}</span></div>
-            <div class="amount-item"><span class="label">用餐</span><span class="val">¥{{ log.totalMeal||0 }}</span></div>
-            <div class="amount-item" v-if="(log.totalEntertain||0)>0"><span class="label">招待</span><span class="val">¥{{ log.totalEntertain }}</span></div>
-            <div class="amount-item" v-if="(log.totalAdvance||0)>0"><span class="label">垫资</span><span class="val">¥{{ log.totalAdvance }}</span></div>
+            <div class="amount-item"><span class="label">补贴</span><span class="val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+(log.subsidyTotal||0) }}</span></div>
+            <div class="amount-item"><span class="label">交通</span><span class="val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+(log.totalTransport||0) }}</span></div>
+            <div class="amount-item"><span class="label">用餐</span><span class="val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+(log.totalMeal||0) }}</span></div>
+            <div class="amount-item" v-if="(log.totalEntertain||0)>0"><span class="label">招待</span><span class="val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+log.totalEntertain }}</span></div>
+            <div class="amount-item" v-if="(log.totalAdvance||0)>0"><span class="label">垫资</span><span class="val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+log.totalAdvance }}</span></div>
           </div>
           <div class="log-card-footer">
             <div>
               <div class="reimburse-total">
-                <small>公司报销</small>¥{{ fmt(log.reimbursementTotal||0) }}
+                <small>公司报销</small>{{ hideAmounts?'¥****':'¥'+fmt(log.reimbursementTotal||0) }}
               </div>
               <div class="personal-cost" v-if="(log.personalTotal||0)>0">
-                个人支出 ¥{{ fmt(log.personalTotal) }}
+                个人支出 {{ hideAmounts?'¥****':'¥'+fmt(log.personalTotal) }}
               </div>
             </div>
             <label class="reimburse-check">
@@ -702,10 +752,32 @@ textarea{resize:vertical;min-height:60px}
   <!-- ===== 右侧面板 ===== -->
   <div class="right-panel">
 
-    <!-- 费用流向桑基图 -->
+    <!-- 个人出差记账 -->
     <div class="card">
-      <div class="panel-title">💸 费用流向</div>
-      <div class="chart-wrap" ref="sankeyChartEl"></div>
+      <div class="panel-title" style="margin-bottom:12px">📒 个人出差记账</div>
+      <div class="expense-summary-grid" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="expense-cat">
+          <div class="expense-cat-icon">🏨</div>
+          <div class="expense-cat-label">住宿费</div>
+          <div class="expense-cat-val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalPersonalHotel) }}</div>
+        </div>
+        <div class="expense-cat">
+          <div class="expense-cat-icon">🍽️</div>
+          <div class="expense-cat-label">餐饮费</div>
+          <div class="expense-cat-val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalPersonalMeal) }}</div>
+        </div>
+        <div class="expense-cat">
+          <div class="expense-cat-icon">💰</div>
+          <div class="expense-cat-label">其他消费</div>
+          <div class="expense-cat-val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalOtherExpense) }}</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--glass-border)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="color:var(--text-muted);font-size:.82rem">个人支出合计</span>
+          <span style="color:var(--danger);font-weight:700;font-size:1.05rem" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalPersonalHotel+totalPersonalMeal+totalOtherExpense) }}</span>
+        </div>
+      </div>
     </div>
 
     <!-- 报销柱状图 -->
@@ -721,39 +793,20 @@ textarea{resize:vertical;min-height:60px}
       <div class="chart-wrap-sm" ref="barChartEl"></div>
     </div>
 
-    <!-- 个人支出 -->
-    <div class="card">
-      <div class="panel-title">👤 个人实际支出</div>
-      <div class="stat-grid">
-        <div class="stat-item">
-          <div class="s-val">¥{{ fmt(totalPersonalHotel) }}</div>
-          <div class="s-label">住宿AA分摊</div>
-        </div>
-        <div class="stat-item">
-          <div class="s-val">¥{{ fmt(totalPersonalMeal) }}</div>
-          <div class="s-label">用餐AA分摊</div>
-        </div>
-        <div class="stat-item full">
-          <div class="s-val" style="color:var(--danger)">¥{{ fmt(totalPersonalHotel+totalPersonalMeal) }}</div>
-          <div class="s-label">个人支出合计</div>
-        </div>
-      </div>
-    </div>
-
     <!-- 报销状态 -->
     <div class="card">
       <div class="panel-title">📑 报销状态</div>
       <div class="stat-grid">
         <div class="stat-item">
-          <div class="s-val" style="color:var(--danger)">¥{{ fmt(totalUnreimbursed) }}</div>
+          <div class="s-val" style="color:var(--danger)" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalUnreimbursed) }}</div>
           <div class="s-label">待报销金额</div>
         </div>
         <div class="stat-item">
-          <div class="s-val" style="color:var(--success)">¥{{ fmt(totalReimbursed) }}</div>
+          <div class="s-val" style="color:var(--success)" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalReimbursed) }}</div>
           <div class="s-label">已报销金额</div>
         </div>
         <div class="stat-item full">
-          <div class="s-val">¥{{ fmt(totalReimbursed+totalUnreimbursed) }}</div>
+          <div class="s-val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalReimbursed+totalUnreimbursed) }}</div>
           <div class="s-label">公司报销总额</div>
         </div>
       </div>
@@ -761,20 +814,180 @@ textarea{resize:vertical;min-height:60px}
 
     <!-- 常用联系人 -->
     <div class="card">
-      <div class="panel-title">📞 常用联系人</div>
-      <div v-if="contactGroups.length===0" style="color:var(--text-muted);font-size:.82rem;text-align:center;padding:16px">暂无联系人</div>
+      <div class="panel-title">📇 常用联系人</div>
+      <div v-if="contactGroups.length===0" style="padding:16px;text-align:center;color:var(--text-dim);font-size:.85rem">
+        暂无联系人（在出差记录中添加项目联系人后自动显示）
+      </div>
       <div v-for="grp in contactGroups" :key="grp.project" class="contact-group">
-        <div class="contact-group-header" @click="grp.open=!grp.open">
-          <span class="contact-group-name">{{ grp.project||'未分类' }}</span>
-          <div style="display:flex;align-items:center;gap:6px">
-            <span class="badge badge-primary">{{ grp.contacts.length }}</span>
-            <span style="font-size:.75rem;color:var(--text-muted)">{{ grp.open?'▲':'▼' }}</span>
+        <div class="contact-group-header" :class="{expanded:isContactGroupOpen(grp.project)}" @click="toggleContactGroup(grp.project)">
+          <span class="contact-group-name">📁 {{ grp.project || '(未关联项目)' }}</span>
+          <span style="font-size:.75rem;color:var(--text-dim)">{{ grp.contacts.length }}人</span>
+        </div>
+        <div v-show="isContactGroupOpen(grp.project)">
+          <div v-for="c in grp.contacts" :key="c.name+c.contact" class="contact-item">
+            <span>{{ c.name }}<span v-if="c.project" style="color:var(--text-dim);font-size:.75rem;margin-left:6px">{{ c.project }}</span></span>
+            <span style="color:var(--primary-light);font-size:.8rem">{{ c.contact||'-' }}</span>
           </div>
         </div>
-        <div v-if="grp.open">
-          <div v-for="c in grp.contacts" :key="c.name+c.contact" class="contact-item">
-            <span class="text-white">{{ c.name }}</span>
-            <span class="text-muted">{{ c.contact }}</span>
+      </div>
+    </div>
+
+    <!-- 施工管理综合模块（工作日志 + 问题库 + 进度管理） -->
+    <div class="card" style="padding-bottom:0">
+      <!-- Tab切换栏 -->
+      <div class="tab-bar">
+        <div class="tab-item" :class="{active:workTab==='worklog'}" @click="workTab='worklog'">
+          📝 工作日志<span class="tab-count">{{ workLogs.length }}</span>
+        </div>
+        <div class="tab-item" :class="{active:workTab==='issues'}" @click="workTab='issues'">
+          ⚠️ 问题库<span class="tab-count">{{ issues.length }}</span>
+        </div>
+        <div class="tab-item" :class="{active:workTab==='progress'}" @click="workTab='progress'">
+          📊 施工进度<span class="tab-count">{{ progresses.length }}</span>
+        </div>
+      </div>
+
+      <!-- ===== Tab1: 工作日志 ===== -->
+      <div class="tab-content" v-show="workTab==='worklog'">
+        <div v-if="!isReadOnly" style="margin-bottom:10px;display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" @click="openWorkLogForm(null)">✚ 记录今天</button>
+          <div class="export-wrap" style="position:relative">
+            <button class="btn btn-ghost btn-sm" @click="showWorkLogExport=!showWorkLogExport">📤 导出 ▾</button>
+            <div v-if="showWorkLogExport" class="export-dropdown">
+              <button @click="exportWorkLogExcel">📊 Excel</button>
+              <button @click="exportWorkLogWord">📝 Word</button>
+            </div>
+          </div>
+        </div>
+        <div class="worklog-list">
+          <div v-if="sortedWorkLogs.length===0" style="padding:20px;text-align:center;color:var(--text-dim);font-size:.85rem">
+            暂无工作日志
+          </div>
+          <div v-for="w in sortedWorkLogs" :key="w.id" class="worklog-item">
+            <div class="worklog-item-header">
+              <div class="worklog-item-date">
+                <span class="worklog-date-badge">{{ w.date }}</span>
+                <span class="worklog-type-badge">{{ w.type }}</span>
+              </div>
+              <div class="worklog-item-actions" v-if="!isReadOnly">
+                <button class="btn-icon" style="width:24px;height:24px;font-size:.7rem" @click="openWorkLogForm(w)">✏️</button>
+                <button class="btn-icon danger" style="width:24px;height:24px;font-size:.7rem" @click="deleteWorkLog(w.id)">🗑️</button>
+              </div>
+            </div>
+            <div class="worklog-item-content">{{ w.content || '(未填内容)' }}</div>
+            <div class="worklog-item-meta" v-if="w.participants || w.location">
+              <span v-if="w.participants">👥 {{ w.participants }}</span>
+              <span v-if="w.location">📍 {{ w.location }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Tab2: 施工问题库 ===== -->
+      <div class="tab-content" v-show="workTab==='issues'">
+        <div v-if="!isReadOnly" style="margin-bottom:10px;display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" @click="openIssueForm(null)">✚ 新建问题</button>
+          <button class="btn btn-ghost btn-sm" @click="showIssueFilter=!showIssueFilter">🔍 筛选</button>
+          <div class="export-wrap" style="position:relative">
+            <button class="btn btn-ghost btn-sm" @click="showIssueExport=!showIssueExport">📤 导出 ▾</button>
+            <div v-if="showIssueExport" class="export-dropdown">
+              <button @click="exportIssueExcel">📊 Excel</button>
+              <button @click="exportIssueWord">📝 Word</button>
+            </div>
+          </div>
+        </div>
+        <!-- 筛选 -->
+        <div v-if="showIssueFilter" class="form-row cols-2" style="margin-bottom:8px;gap:6px">
+          <div class="form-group">
+            <label class="form-label">状态</label>
+            <select v-model="issueFilter.status" style="font-size:.8rem;padding:5px 8px">
+              <option value="">全部</option>
+              <option value="待处理">待处理</option><option value="处理中">处理中</option>
+              <option value="已解决">已解决</option><option value="已关闭">已关闭</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">优先级</label>
+            <select v-model="issueFilter.priority" style="font-size:.8rem;padding:5px 8px">
+              <option value="">全部</option>
+              <option value="高">高</option><option value="中">中</option><option value="低">低</option>
+            </select>
+          </div>
+        </div>
+        <!-- 问题列表 -->
+        <div style="max-height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-bottom:16px">
+          <div v-if="filteredIssues.length===0" style="padding:20px;text-align:center;color:var(--text-dim);font-size:.85rem">
+            暂无施工问题
+          </div>
+          <div v-for="iss in filteredIssues" :key="iss.id" class="worklog-item" style="border-left:3px solid" :style="{borderLeftColor: iss.priority==='高'?'var(--danger)':iss.priority==='中'?'var(--warning)':'var(--success)'}">
+            <div class="worklog-item-header">
+              <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
+                <span class="badge" :class="{
+                  'badge-danger':iss.status==='待处理',
+                  'badge-gold':iss.status==='处理中',
+                  'badge-success':iss.status==='已解决',
+                  'badge-info':iss.status==='已关闭'
+                }">{{ iss.status }}</span>
+                <span style="font-size:.82rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" :title="iss.title">{{ iss.title }}</span>
+              </div>
+              <div class="worklog-item-actions" v-if="!isReadOnly">
+                <button class="btn-icon" style="width:24px;height:24px;font-size:.7rem" @click="openIssueForm(iss)">✏️</button>
+                <button class="btn-icon danger" style="width:24px;height:24px;font-size:.7rem" @click="deleteIssue(iss.id)">🗑️</button>
+              </div>
+            </div>
+            <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:4px">{{ iss.description||'' }}</div>
+            <div class="worklog-item-meta">
+              <span v-if="iss.priority">🔥 优先级: {{ iss.priority }}</span>
+              <span v-if="iss.project">📁 {{ iss.project }}</span>
+              <span v-if="iss.reportDate">📅 {{ iss.reportDate }}</span>
+              <span v-if="iss.resolveDate">✅ {{ iss.resolveDate }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Tab3: 施工进度管理 ===== -->
+      <div class="tab-content" v-show="workTab==='progress'">
+        <div v-if="!isReadOnly" style="margin-bottom:10px;display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" @click="openProgressForm(null)">✚ 新建任务</button>
+          <div class="export-wrap" style="position:relative">
+            <button class="btn btn-ghost btn-sm" @click="showProgressExport=!showProgressExport">📤 导出 ▾</button>
+            <div v-if="showProgressExport" class="export-dropdown">
+              <button @click="exportProgressExcel">📊 Excel</button>
+              <button @click="exportProgressWord">📝 Word</button>
+            </div>
+          </div>
+        </div>
+        <div style="max-height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-bottom:16px">
+          <div v-if="sortedProgress.length===0" style="padding:20px;text-align:center;color:var(--text-dim);font-size:.85rem">
+            暂无进度记录
+          </div>
+          <div v-for="pg in sortedProgress" :key="pg.id" class="worklog-item">
+            <div class="worklog-item-header">
+              <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
+                <span style="font-size:.85rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" :title="pg.taskName">{{ pg.taskName }}</span>
+                <span class="badge" :class="{
+                  'badge-danger':pg.progress<30,
+                  'badge-gold':pg.progress>=30&&pg.progress<70,
+                  'badge-success':pg.progress>=70&&pg.progress<100,
+                  'badge-info':pg.progress>=100
+                }">{{ pg.progress>=100?'已完成':pg.progress+'%' }}</span>
+              </div>
+              <div class="worklog-item-actions" v-if="!isReadOnly">
+                <button class="btn-icon" style="width:24px;height:24px;font-size:.7rem" @click="openProgressForm(pg)">✏️</button>
+                <button class="btn-icon danger" style="width:24px;height:24px;font-size:.7rem" @click="deleteProgress(pg.id)">🗑️</button>
+              </div>
+            </div>
+            <div style="margin:6px 0;background:#ffffff10;border-radius:10px;height:8px;overflow:hidden">
+              <div :style="{width:Math.min(pg.progress,100)+'%',background:pg.progress>=100?'var(--success)':pg.progress>=70?'#22c55ecc':pg.progress>=30?'var(--warning)':'var(--danger)',transition:'width .3s',height:'100%',borderRadius:'10px'}"></div>
+            </div>
+            <div class="worklog-item-meta">
+              <span v-if="pg.project">📁 {{ pg.project }}</span>
+              <span v-if="pg.plannedStart">📅 计划: {{ pg.plannedStart }} ~ {{ pg.plannedEnd }}</span>
+              <span v-if="pg.actualEnd">✅ 实际完成: {{ pg.actualEnd }}</span>
+              <span v-if="pg.responsible">👤 {{ pg.responsible }}</span>
+            </div>
+            <div v-if="pg.remark" style="font-size:.76rem;color:var(--text-dim);margin-top:4px">💬 {{ pg.remark }}</div>
           </div>
         </div>
       </div>
@@ -845,53 +1058,35 @@ textarea{resize:vertical;min-height:60px}
           <div v-if="form.hotelAA && form.roommateCount>1 && form.hotelPrice>0 && form.days>0" class="hint warn">
             人均住宿: ¥{{ fmt(form.hotelPrice * form.days / form.roommateCount) }} ({{ form.days }}晚 ÷ {{ form.roommateCount }}人)
           </div>
-          <div class="form-row cols-2">
-            <div class="form-group">
-              <label class="form-label">项目名称</label>
-              <input type="text" v-model="form.projectName" placeholder="如：肯尼亚内马铁路">
-            </div>
-            <div></div>
-          </div>
           <div class="form-group">
-            <label class="form-label">工作内容</label>
-            <textarea v-model="form.workContent" placeholder="简要描述本次出差工作内容…"></textarea>
+            <label class="form-label">项目情况</label>
+            <textarea v-model="form.workContent" placeholder="项目名称 + 本次出差目的与情况…" rows="2"></textarea>
+          </div>
+          <!-- 项目联系人 -->
+          <div style="margin-top:4px">
+            <div class="form-label" style="margin-bottom:6px">项目联系人</div>
+            <div v-for="(c,i) in form.contacts" :key="'c'+i" class="dyn-row" style="padding:8px 10px">
+              <button class="btn-icon danger dyn-row-del" @click="form.contacts.splice(i,1)">✕</button>
+              <div class="form-row cols-3" style="padding-right:30px">
+                <div class="form-group">
+                  <label class="form-label">姓名</label>
+                  <input type="text" v-model="c.name" placeholder="联系人姓名">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">联系方式</label>
+                  <input type="text" v-model="c.contact" placeholder="电话/微信">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">职务/备注</label>
+                  <input type="text" v-model="c.project" placeholder="职务或备注">
+                </div>
+              </div>
+            </div>
+            <button class="add-row-btn" @click="addContact">＋ 添加联系人</button>
           </div>
         </div>
       </div>
 
-      <!-- 地点信息 -->
-      <div class="section-block">
-        <div class="section-header" @click="toggleSection('location')">
-          <div class="section-header-left"><span class="section-icon">📍</span>地点信息</div>
-          <span class="section-arrow" :class="{open:sections.location}">▼</span>
-        </div>
-        <div class="section-body" :class="{hidden:!sections.location}">
-          <div class="region-tabs">
-            <div class="region-tab" :class="{active:form.regionType==='domestic'}" @click="form.regionType='domestic'">🇨🇳 国内</div>
-            <div class="region-tab" :class="{active:form.regionType==='international'}" @click="form.regionType='international'">🌍 国际</div>
-          </div>
-          <div class="form-row cols-2">
-            <div class="form-group">
-              <label class="form-label">{{ form.regionType==='domestic'?'省份':'国家' }}</label>
-              <input type="text" v-model="form.province" :list="'province-list-'+form.regionType" placeholder="请输入或选择">
-              <datalist :id="'province-list-'+form.regionType">
-                <option v-for="p in currentProvinces" :key="p" :value="p"></option>
-              </datalist>
-            </div>
-            <div class="form-group">
-              <label class="form-label">城市</label>
-              <input type="text" v-model="form.city" list="city-list" placeholder="请输入或选择">
-              <datalist id="city-list">
-                <option v-for="c in currentCities" :key="c" :value="c"></option>
-              </datalist>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">详细地址</label>
-            <input type="text" v-model="form.customLocation" placeholder="具体地址（可选）">
-          </div>
-        </div>
-      </div>
 
       <!-- 补贴 -->
       <div class="section-block">
@@ -916,12 +1111,13 @@ textarea{resize:vertical;min-height:60px}
             </select>
           </div>
           <div v-else class="form-group">
-            <label class="form-label">自定义总补贴 (¥)</label>
+            <label class="form-label">自定义每日补贴 (¥/天)</label>
             <input type="number" v-model.number="form.customSubsidy" placeholder="0" min="0">
           </div>
           <div v-if="form.days>0" class="hint info">
             补贴小计: ¥{{ fmt(calcSubsidyTotal()) }}
             <span v-if="form.subsidyType==='preset'"> ({{ form.subsidyAmount }}×{{ form.days }}天)</span>
+            <span v-else-if="form.customSubsidy"> ({{ form.customSubsidy }}×{{ form.days }}天)</span>
           </div>
         </div>
       </div>
@@ -933,6 +1129,7 @@ textarea{resize:vertical;min-height:60px}
           <span class="section-arrow" :class="{open:sections.transport}">▼</span>
         </div>
         <div class="section-body" :class="{hidden:!sections.transport}">
+          <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--glass-border)">交通记录明细</div>
           <div v-for="(t,i) in form.transports" :key="i" class="dyn-row">
             <button class="btn-icon danger dyn-row-del" @click="form.transports.splice(i,1)">✕</button>
             <div class="form-row cols-2" style="padding-right:30px">
@@ -1094,33 +1291,44 @@ textarea{resize:vertical;min-height:60px}
         </div>
       </div>
 
-      <!-- 施工方联系人 -->
+      <!-- 其他个人消费 -->
       <div class="section-block">
-        <div class="section-header" @click="toggleSection('contacts')">
-          <div class="section-header-left"><span class="section-icon">📞</span>施工方联系人</div>
-          <span class="section-arrow" :class="{open:sections.contacts}">▼</span>
+        <div class="section-header" @click="toggleSection('otherexp')">
+          <div class="section-header-left"><span class="section-icon">💰</span>其他个人消费</div>
+          <span class="section-arrow" :class="{open:sections.otherexp}">▼</span>
         </div>
-        <div class="section-body" :class="{hidden:!sections.contacts}">
-          <div v-for="(c,i) in form.contacts" :key="i" class="dyn-row">
-            <button class="btn-icon danger dyn-row-del" @click="form.contacts.splice(i,1)">✕</button>
+        <div class="section-body" :class="{hidden:!sections.otherexp}">
+          <div class="hint info" style="margin-bottom:8px">记录出差期间除住宿、餐饮外的个人消费（如日用品、电话费、洗衣费等）</div>
+          <div v-for="(o,i) in form.otherExpenses" :key="i" class="dyn-row">
+            <button class="btn-icon danger dyn-row-del" @click="form.otherExpenses.splice(i,1)">✕</button>
             <div class="form-row cols-3" style="padding-right:30px">
               <div class="form-group">
-                <label class="form-label">姓名</label>
-                <input type="text" v-model="c.name" placeholder="联系人姓名">
+                <label class="form-label">消费类型</label>
+                <select v-model="o.category">
+                  <option>日用品</option><option>通讯费</option><option>洗衣费</option>
+                  <option>交通费(市内)</option><option>购物</option><option>其他</option>
+                </select>
               </div>
               <div class="form-group">
-                <label class="form-label">手机/微信号</label>
-                <input type="text" v-model="c.contact" placeholder="电话或微信">
+                <label class="form-label">金额 (¥)</label>
+                <input type="number" v-model.number="o.amount" placeholder="0" min="0">
               </div>
               <div class="form-group">
-                <label class="form-label">关联项目</label>
-                <input type="text" v-model="c.project" placeholder="默认当前项目">
+                <label class="form-label">日期</label>
+                <input type="date" v-model="o.date">
               </div>
             </div>
+            <div class="form-group">
+              <label class="form-label">说明（可选）</label>
+              <input type="text" v-model="o.description" placeholder="消费说明">
+            </div>
           </div>
-          <button class="add-row-btn" @click="addContact">＋ 添加联系人</button>
+          <button class="add-row-btn" @click="form.otherExpenses.push({category:'日用品',amount:0,date:'',description:''})">＋ 添加消费记录</button>
+          <div v-if="form.otherExpenses.length" class="hint info">其他消费合计: ¥{{ fmt(form.otherExpenses.reduce((s,o)=>s+(o.amount||0),0)) }}</div>
         </div>
       </div>
+
+
 
     </div>
 
@@ -1142,143 +1350,179 @@ textarea{resize:vertical;min-height:60px}
 <!-- 移动端悬浮新建按钮 -->
 <button v-if="!isReadOnly && !showModal" class="fab-create" @click="openCreate">✚</button>
 
+<!-- ===== 工作日志编辑模态框 ===== -->
+<transition name="fade">
+<div v-if="showWorkLogModal" class="modal-overlay" @click.self="showWorkLogModal=false">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <span class="modal-title">{{ editingWorkLogId?'编辑工作日志':'记录工作日志' }}</span>
+      <button class="modal-close" @click="showWorkLogModal=false">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label">日期 *</label>
+          <input type="date" v-model="workLogForm.date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">工作类型</label>
+          <select v-model="workLogForm.type">
+            <option>现场勘察</option><option>会议沟通</option><option>设备调试</option>
+            <option>技术培训</option><option>施工监督</option><option>验收检查</option>
+            <option>商务洽谈</option><option>其他</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">工作内容</label>
+        <textarea v-model="workLogForm.content" placeholder="描述今天的工作内容…" rows="3"></textarea>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label">参与人员</label>
+          <input type="text" v-model="workLogForm.participants" placeholder="参与人员（可空）">
+        </div>
+        <div class="form-group">
+          <label class="form-label">工作地点</label>
+          <input type="text" v-model="workLogForm.location" placeholder="工作地点（可空）">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" @click="showWorkLogModal=false">取消</button>
+        <button class="btn btn-primary" @click="saveWorkLog">💾 保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+</transition>
+
+<!-- ===== 施工问题库编辑模态框 ===== -->
+<transition name="fade">
+<div v-if="showIssueModal" class="modal-overlay" @click.self="showIssueModal=false">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <span class="modal-title">{{ editingIssueId?'编辑施工问题':'新建施工问题' }}</span>
+      <button class="modal-close" @click="showIssueModal=false">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">问题标题 *</label>
+        <input type="text" v-model="issueForm.title" placeholder="简要描述问题">
+      </div>
+      <div class="form-group">
+        <label class="form-label">详细描述</label>
+        <textarea v-model="issueForm.description" placeholder="问题描述、影响范围等…" rows="3"></textarea>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label">所属项目</label>
+          <input type="text" v-model="issueForm.project" placeholder="关联项目">
+        </div>
+        <div class="form-group">
+          <label class="form-label">优先级</label>
+          <select v-model="issueForm.priority">
+            <option>高</option><option>中</option><option>低</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label">状态</label>
+          <select v-model="issueForm.status">
+            <option>待处理</option><option>处理中</option><option>已解决</option><option>已关闭</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">上报日期</label>
+          <input type="date" v-model="issueForm.reportDate">
+        </div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label">处理人</label>
+          <input type="text" v-model="issueForm.handler" placeholder="处理责任人">
+        </div>
+        <div class="form-group">
+          <label class="form-label">解决日期</label>
+          <input type="date" v-model="issueForm.resolveDate">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" @click="showIssueModal=false">取消</button>
+        <button class="btn btn-primary" @click="saveIssue">💾 保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+</transition>
+
+<!-- ===== 施工进度管理编辑模态框 ===== -->
+<transition name="fade">
+<div v-if="showProgressModal" class="modal-overlay" @click.self="showProgressModal=false">
+  <div class="modal" style="max-width:620px">
+    <div class="modal-header">
+      <span class="modal-title">{{ editingProgressId?'编辑施工进度':'新建施工进度' }}</span>
+      <button class="modal-close" @click="showProgressModal=false">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">任务名称 *</label>
+        <input type="text" v-model="progressForm.taskName" placeholder="施工任务名称">
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label">所属项目</label>
+          <input type="text" v-model="progressForm.project" placeholder="关联项目">
+        </div>
+        <div class="form-group">
+          <label class="form-label">当前进度 (0-100%)</label>
+          <input type="number" v-model.number="progressForm.progress" min="0" max="100" placeholder="0">
+        </div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label">计划开始日期</label>
+          <input type="date" v-model="progressForm.plannedStart">
+        </div>
+        <div class="form-group">
+          <label class="form-label">计划结束日期</label>
+          <input type="date" v-model="progressForm.plannedEnd">
+        </div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label class="form-label">实际完成日期</label>
+          <input type="date" v-model="progressForm.actualEnd">
+        </div>
+        <div class="form-group">
+          <label class="form-label">负责人</label>
+          <input type="text" v-model="progressForm.responsible" placeholder="施工负责人">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">备注说明</label>
+        <textarea v-model="progressForm.remark" placeholder="进度备注、延迟原因等…" rows="2"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" @click="showProgressModal=false">取消</button>
+        <button class="btn btn-primary" @click="saveProgress">💾 保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+</transition>
+
 </div><!-- end #app -->
 <script>
-// ===== 城市/国家数据 =====
-const CITY_DATA = {
-  domestic: {
-    "北京市":["东城区","西城区","朝阳区","海淀区","丰台区","石景山区","通州区","顺义区","房山区","大兴区","昌平区"],
-    "天津市":["和平区","河东区","河西区","南开区","河北区","红桥区","滨海新区","东丽区","西青区","津南区","北辰区"],
-    "上海市":["黄浦区","徐汇区","长宁区","静安区","普陀区","虹口区","杨浦区","浦东新区","闵行区","宝山区","嘉定区","松江区"],
-    "重庆市":["渝中区","江北区","南岸区","渝北区","沙坪坝区","九龙坡区","大渡口区","巴南区","北碚区"],
-    "河北省":["石家庄市","唐山市","保定市","邯郸市","秦皇岛市","邢台市","张家口市","承德市","沧州市","廊坊市","衡水市"],
-    "山西省":["太原市","大同市","运城市","长治市","晋城市","临汾市","忻州市","晋中市","阳泉市","朔州市","吕梁市"],
-    "辽宁省":["沈阳市","大连市","鞍山市","抚顺市","锦州市","营口市","丹东市","阜新市","辽阳市","盘锦市","铁岭市","朝阳市","葫芦岛市"],
-    "吉林省":["长春市","吉林市","四平市","辽源市","通化市","白山市","松原市","白城市","延边州"],
-    "黑龙江省":["哈尔滨市","齐齐哈尔市","牡丹江市","佳木斯市","大庆市","鸡西市","双鸭山市","伊春市","七台河市","鹤岗市","绥化市","黑河市","大兴安岭地区"],
-    "江苏省":["南京市","苏州市","无锡市","常州市","南通市","徐州市","连云港市","淮安市","盐城市","扬州市","镇江市","泰州市","宿迁市"],
-    "浙江省":["杭州市","宁波市","温州市","嘉兴市","湖州市","绍兴市","金华市","衢州市","舟山市","台州市","丽水市"],
-    "安徽省":["合肥市","芜湖市","蚌埠市","淮南市","马鞍山市","淮北市","铜陵市","安庆市","黄山市","阜阳市","宿州市","滁州市","六安市","宣城市","池州市","亳州市"],
-    "福建省":["福州市","厦门市","泉州市","漳州市","莆田市","龙岩市","三明市","南平市","宁德市"],
-    "江西省":["南昌市","九江市","赣州市","吉安市","上饶市","抚州市","宜春市","景德镇市","萍乡市","新余市","鹰潭市"],
-    "山东省":["济南市","青岛市","烟台市","潍坊市","临沂市","济宁市","淄博市","威海市","德州市","泰安市","聊城市","滨州市","菏泽市","枣庄市","东营市","日照市"],
-    "河南省":["郑州市","洛阳市","开封市","新乡市","安阳市","许昌市","南阳市","信阳市","周口市","驻马店市","商丘市","焦作市","平顶山市","漯河市","濮阳市","鹤壁市","三门峡市","济源市"],
-    "湖北省":["武汉市","宜昌市","襄阳市","荆州市","十堰市","黄冈市","孝感市","咸宁市","荆门市","鄂州市","黄石市","随州市","恩施州"],
-    "湖南省":["长沙市","株洲市","湘潭市","衡阳市","邵阳市","岳阳市","常德市","张家界市","益阳市","郴州市","永州市","怀化市","娄底市","湘西州"],
-    "广东省":["广州市","深圳市","东莞市","佛山市","珠海市","惠州市","中山市","汕头市","江门市","湛江市","茂名市","肇庆市","揭阳市","梅州市","清远市","韶关市","潮州市","河源市","阳江市","云浮市","汕尾市"],
-    "海南省":["海口市","三亚市","儋州市","琼海市","万宁市","文昌市"],
-    "四川省":["成都市","绵阳市","德阳市","宜宾市","南充市","泸州市","达州市","乐山市","眉山市","自贡市","内江市","遂宁市","广安市","资阳市","攀枝花市","雅安市","广元市","巴中市","凉山州","甘孜州","阿坝州"],
-    "贵州省":["贵阳市","遵义市","六盘水市","安顺市","毕节市","铜仁市","黔南州","黔东南州","黔西南州"],
-    "云南省":["昆明市","曲靖市","玉溪市","大理州","红河州","楚雄州","文山州","普洱市","保山市","昭通市","丽江市","临沧市","西双版纳州","德宏州"],
-    "陕西省":["西安市","宝鸡市","咸阳市","渭南市","铜川市","延安市","榆林市","汉中市","安康市","商洛市"],
-    "甘肃省":["兰州市","天水市","白银市","武威市","酒泉市","嘉峪关市","张掖市","庆阳市","平凉市","定西市","陇南市","临夏州","甘南州"],
-    "青海省":["西宁市","海东市","海北州","海南州","黄南州","果洛州","玉树州","海西州"],
-    "内蒙古自治区":["呼和浩特市","包头市","鄂尔多斯市","赤峰市","通辽市","呼伦贝尔市","巴彦淖尔市","乌兰察布市","兴安盟","锡林郭勒盟","阿拉善盟","乌海市"],
-    "广西壮族自治区":["南宁市","柳州市","桂林市","梧州市","北海市","玉林市","钦州市","百色市","贵港市","河池市","来宾市","崇左市","防城港市","贺州市"],
-    "西藏自治区":["拉萨市","日喀则市","林芝市","昌都市","山南市","那曲市","阿里地区"],
-    "宁夏回族自治区":["银川市","石嘴山市","吴忠市","固原市","中卫市"],
-    "新疆维吾尔自治区":["乌鲁木齐市","克拉玛依市","吐鲁番市","哈密市","昌吉州","伊犁州","阿克苏地区","喀什地区","和田地区","塔城地区","阿勒泰地区","巴音郭楞州","博尔塔拉州","克孜勒苏州"],
-    "香港特别行政区":["中西区","湾仔区","东区","南区","油尖旺区","九龙城区","沙田区","元朗区"],
-    "澳门特别行政区":["澳门半岛","凼仔","路环"],
-    "台湾省":["台北市","高雄市","台中市","台南市","新北市","桃园市","基隆市","新竹市","嘉义市"]
-  },
-  international: {
-    "巴西":["圣保罗","里约热内卢","巴西利亚","萨尔瓦多","贝洛奥里藏特","福塔莱萨","马瑙斯","库里蒂巴","累西腓","阿雷格里港","贝伦","戈亚尼亚","坎皮纳斯"],
-    "阿根廷":["布宜诺斯艾利斯","科尔多瓦","罗萨里奥","门多萨","图库曼","拉普拉塔","马尔 del Plata","圣达菲"],
-    "智利":["圣地亚哥","瓦尔帕莱索","康塞普西翁","安托法加斯塔","蒙特港","特木科"],
-    "秘鲁":["利马","阿雷基帕","库斯科","特鲁希略","皮乌拉","伊基托斯"],
-    "哥伦比亚":["波哥大","麦德林","卡利","巴兰基亚","卡塔赫纳","布卡拉曼加","佩雷拉"],
-    "墨西哥":["墨西哥城","瓜达拉哈拉","蒙特雷","坎昆","蒂华纳","普埃布拉","梅里达","莱昂"],
-    "委内瑞拉":["加拉加斯","马拉开波","瓦伦西亚","巴基西梅托"],
-    "厄瓜多尔":["基多","瓜亚基尔","昆卡","曼塔"],
-    "玻利维亚":["拉巴斯","圣克鲁斯","科恰班巴","苏克雷"],
-    "肯尼亚":["内罗毕","蒙巴萨","基苏木","纳库鲁","埃尔多雷特","尼亚里"],
-    "坦桑尼亚":["达累斯萨拉姆","多多马","阿鲁沙","姆万扎","坦噶","桑给巴尔"],
-    "埃塞俄比亚":["亚的斯亚贝巴","德雷达瓦","迪拜达瓦","巴哈尔达尔","哈拉尔"],
-    "尼日利亚":["拉各斯","阿布贾","卡诺","伊巴丹","哈科特港","贝宁城","阿贝奥库塔"],
-    "南非":["约翰内斯堡","开普敦","德班","比勒陀利亚","伊丽莎白港","布隆方丹"],
-    "埃及":["开罗","亚历山大","卢克索","阿斯旺","苏伊士","吉萨"],
-    "摩洛哥":["卡萨布兰卡","拉巴特","马拉喀什","非斯","丹吉尔","梅克内斯"],
-    "印度尼西亚":["雅加达","泗水","万隆","棉兰","巴厘岛(登巴萨)","望加锡","三宝垄"],
-    "马来西亚":["吉隆坡","槟城","新山","怡保","古晋","亚庇","关丹"],
-    "新加坡":["新加坡市"],
-    "泰国":["曼谷","清迈","普吉岛","芭提雅","清莱","合艾"],
-    "越南":["河内","胡志明市(西贡)","岘港","海防","芽庄","顺化"],
-    "菲律宾":["马尼拉","宿务","达沃","伊洛伊洛","奎松城"],
-    "柬埔寨":["金边","暹粒","西哈努克港"],
-    "缅甸":["仰光","曼德勒","内比都","蒲甘"],
-    "老挝":["万象","琅勃拉邦","巴色"],
-    "巴基斯坦":["伊斯兰堡","卡拉奇","拉合尔","费萨拉巴德","白沙瓦","木尔坦","海得拉巴"],
-    "印度":["新德里","孟买","班加罗尔","海德拉巴","金奈","加尔各答","浦那","艾哈迈达巴德"],
-    "斯里兰卡":["科伦坡","康提","高知"],
-    "孟加拉国":["达卡","吉大港","锡尔赫特","拉杰沙希"],
-    "尼泊尔":["加德满都","博卡拉","蓝毗尼"],
-    "沙特阿拉伯":["利雅得","吉达","麦加","麦地那","达曼","塔伊夫"],
-    "阿联酋":["迪拜","阿布扎比","沙迦","阿治曼","乌姆盖万"],
-    "土耳其":["伊斯坦布尔","安卡拉","伊兹密尔","安塔利亚","布尔萨"],
-    "伊朗":["德黑兰","伊斯法罕","设拉子","大不里士","马什哈德"],
-    "伊拉克":["巴格达","巴士拉","埃尔比勒","摩苏尔"],
-    "以色列":["特拉维夫","耶路撒冷","海法","贝尔谢巴"],
-    "约旦":["安曼","亚喀巴","佩特拉","伊尔比德"],
-    "黎巴嫩":["贝鲁特","的黎波里","赛达"],
-    "哈萨克斯坦":["努尔苏丹(阿斯塔纳)","阿拉木图","希姆肯特","卡拉干达","阿克套"],
-    "乌兹别克斯坦":["塔什干","撒马尔罕","布哈拉","希瓦","纳曼干"],
-    "土库曼斯坦":["阿什哈巴德","土库曼纳巴特","达绍古兹"],
-    "俄罗斯":["莫斯科","圣彼得堡","新西伯利亚","叶卡捷琳堡","喀山","海参崴(符拉迪沃斯托克)"],
-    "白俄罗斯":["明斯克","戈梅利","布列斯特","维捷布斯克"],
-    "塞尔维亚":["贝尔格莱德","诺维萨德","尼什","苏博蒂察"],
-    "希腊":["雅典","萨洛尼卡","帕特雷","伊拉克利翁"],
-    "意大利":["罗马","米兰","都灵","威尼斯","佛罗伦萨","那不勒斯"],
-    "德国":["柏林","慕尼黑","法兰克福","汉堡","科隆","斯图加特","杜塞尔多夫"],
-    "法国":["巴黎","马赛","里昂","图卢兹","尼斯","波尔多","斯特拉斯堡"],
-    "西班牙":["马德里","巴塞罗那","瓦伦西亚","塞维利亚","毕尔巴鄂"],
-    "英国":["伦敦","曼彻斯特","伯明翰","利物浦","爱丁堡","格拉斯哥"],
-    "荷兰":["阿姆斯特丹","鹿特丹","海牙","乌特勒支","埃因霍温"],
-    "比利时":["布鲁塞尔","安特卫普","根特","布鲁日"],
-    "波兰":["华沙","克拉科夫","格但斯克","弗罗茨瓦夫","波兹南"],
-    "捷克":["布拉格","布尔诺","俄斯特拉发"],
-    "匈牙利":["布达佩斯","德布勒森","塞格德"],
-    "罗马尼亚":["布加勒斯特","克卢日-纳波卡","蒂米什瓦拉"],
-    "葡萄牙":["里斯本","波尔图","法鲁"],
-    "奥地利":["维也纳","萨尔茨堡","因斯布鲁克","格拉茨"],
-    "瑞士":["苏黎世","日内瓦","巴塞尔","伯尔尼","洛桑"],
-    "瑞典":["斯德哥尔摩","哥德堡","马尔默","乌普萨拉"],
-    "挪威":["奥斯陆","卑尔根","特隆赫姆","斯塔万格"],
-    "丹麦":["哥本哈根","奥胡斯","欧登塞"],
-    "芬兰":["赫尔辛基","坦佩雷","图尔库","奥卢"],
-    "乌克兰":["基辅","敖德萨","利沃夫","哈尔科夫","第聂伯罗"],
-    "阿塞拜疆":["巴库","占贾","苏姆盖特"],
-    "格鲁吉亚":["第比利斯","巴统","库塔伊西"],
-    "卡塔尔":["多哈","沃克拉","赖扬"],
-    "科威特":["科威特城","哈维利"],
-    "巴林":["麦纳麦","里法"],
-    "阿曼":["马斯喀特","苏哈尔","塞拉莱"],
-    "卡塔尔":["多哈"],
-    "蒙古":["乌兰巴托","达尔汗","额尔登特"],
-    "卢旺达":["基加利","布塔雷","吉塞尼"],
-    "乌干达":["坎帕拉","金贾","恩德培"],
-    "加纳":["阿克拉","库马西","塔马利","特马"],
-    "塞内加尔":["达喀尔","圣路易","济金绍尔"],
-    "科特迪瓦":["阿比让","亚穆苏克罗","布瓦凯"],
-    "喀麦隆":["雅温得","杜阿拉","巴门达"],
-    "安哥拉":["罗安达","本格拉","洛比托"],
-    "莫桑比克":["马普托","贝拉","纳卡拉"],
-    "坦桑尼亚":["多多马","达累斯萨拉姆","阿鲁沙"],
-    "津巴布韦":["哈拉雷","布拉瓦约","穆塔雷"],
-    "赞比亚":["卢萨卡","恩多拉","基特韦"],
-    "马达加斯加":["塔那那利佛","图阿马西纳","安齐拉贝"],
-    "吉布提":["吉布提市"],
-    "塞尔维亚":["贝尔格莱德"],
-    "波黑":["萨拉热窝","巴尼亚卢卡"],
-    "北马其顿":["斯科普里"],
-    "阿尔巴尼亚":["地拉那","都拉斯"],
-    "克罗地亚":["萨格勒布","斯普利特","杜布罗夫尼克"],
-    "黑山":["波德戈里察"],
-    "波斯尼亚和黑塞哥维那":["萨拉热窝"]
-  }
-};
-
-
 // ===== JSONBin 配置 =====
 const BIN_ID = '69e219b636566621a8c2ebd1';
 const API_KEY = '$2a$10$1IN7DPNxJDC0m260.MuYHeWTFfESFF.DGfrivMk/rLM09EqpsFTXe';
@@ -1298,6 +1542,7 @@ function emptyForm() {
     projectName:'',workContent:'',
     subsidyType:'preset',subsidyAmount:260,customSubsidy:0,
     contacts:[],transports:[],meals:[],entertains:[],advances:[],
+    otherExpenses:[],
     reimbursed:false
   };
 }
@@ -1307,14 +1552,21 @@ async function fetchCloud() {
   const r = await fetch(BIN_URL+'/latest', { headers:{'X-Master-Key':API_KEY} });
   if(!r.ok) throw new Error('HTTP '+r.status);
   const d = await r.json();
-  return (d.record && d.record.logs) ? d.record.logs : [];
+  const result = { logs: [], workLogs: [], issues: [], progresses: [] };
+  if(d.record) {
+    if(d.record.logs) result.logs = d.record.logs;
+    if(d.record.workLogs) result.workLogs = d.record.workLogs;
+    if(d.record.issues) result.issues = d.record.issues;
+    if(d.record.progresses) result.progresses = d.record.progresses;
+  }
+  return result;
 }
 
-async function pushCloud(logs) {
+async function pushCloud(logs, workLogs, issues, progresses) {
   const r = await fetch(BIN_URL, {
     method:'PUT',
     headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},
-    body:JSON.stringify({logs})
+    body:JSON.stringify({logs, workLogs, issues, progresses})
   });
   if(!r.ok) throw new Error('HTTP '+r.status);
   return true;
@@ -1328,13 +1580,32 @@ const app = createApp({
   setup() {
     // === 数据 ===
     const logs = ref([]);
+    const workLogs = ref([]);
     const showModal = ref(false);
+    const showWorkLogModal = ref(false);
     const editingId = ref(null);
+    const editingWorkLogId = ref(null);
     const form = reactive(emptyForm());
-    const sections = reactive({ base:true, location:true, subsidy:true, transport:true, meal:true, entertain:true, advance:true, contacts:true });
+    const workLogForm = reactive({ id:'', date:'', type:'现场勘察', content:'', participants:'', location:'' });
+    const showIssueModal = ref(false);
+    const showProgressModal = ref(false);
+    const editingIssueId = ref(null);
+    const editingProgressId = ref(null);
+    const showIssueFilter = ref(false);
+    const issueFilter = reactive({ status:'', priority:'' });
+    const issues = ref([]);
+    const progresses = ref([]);
+    const issueForm = reactive({ id:'', title:'', description:'', project:'', priority:'中', status:'待处理', reportDate:'', handler:'', resolveDate:'' });
+    const progressForm = reactive({ id:'', taskName:'', project:'', progress:0, plannedStart:'', plannedEnd:'', actualEnd:'', responsible:'', remark:'' });
+    const sections = reactive({ base:true, location:true, subsidy:true, transport:true, meal:true, entertain:true, advance:true, contacts:true, otherexp:true });
     const filter = reactive({ dateFrom:'', dateTo:'', keyword:'', project:'' });
     const isReadOnly = ref(false);
     const showExport = ref(false);
+    const showWorkLogExport = ref(false);
+    const showIssueExport = ref(false);
+    const showProgressExport = ref(false);
+    const workTab = ref('worklog');
+    const hideAmounts = ref(false);
     const syncStatus = ref('ok');
     const syncTime = ref('');
     const barGroupBy = ref('all');
@@ -1342,9 +1613,8 @@ const app = createApp({
     const templates = ref([]);
 
     // 图表引用
-    const sankeyChartEl = ref(null);
     const barChartEl = ref(null);
-    let sankeyChart = null, barChart = null;
+    let barChart = null;
 
     // === 同步 ===
     const syncLabel = computed(()=>{
@@ -1356,16 +1626,28 @@ const app = createApp({
     async function loadFromCloud() {
       syncStatus.value = 'syncing';
       try {
-        logs.value = await fetchCloud();
+        const data = await fetchCloud();
+        logs.value = data.logs || [];
+        workLogs.value = data.workLogs || [];
+        issues.value = data.issues || [];
+        progresses.value = data.progresses || [];
         localStorage.setItem('chengtong_logs', JSON.stringify(logs.value));
+        localStorage.setItem('chengtong_worklogs', JSON.stringify(workLogs.value));
+        localStorage.setItem('chengtong_issues', JSON.stringify(issues.value));
+        localStorage.setItem('chengtong_progresses', JSON.stringify(progresses.value));
         syncStatus.value = 'ok';
         syncTime.value = dayjs().format('HH:mm');
         renderCharts();
       } catch(e) {
         console.error('Cloud load error:',e);
-        // fallback to local
         const local = localStorage.getItem('chengtong_logs');
         if(local) { try{ logs.value = JSON.parse(local); }catch(e2){} }
+        const localWL = localStorage.getItem('chengtong_worklogs');
+        if(localWL) { try{ workLogs.value = JSON.parse(localWL); }catch(e3){} }
+        const localIss = localStorage.getItem('chengtong_issues');
+        if(localIss) { try{ issues.value = JSON.parse(localIss); }catch(e4){} }
+        const localProg = localStorage.getItem('chengtong_progresses');
+        if(localProg) { try{ progresses.value = JSON.parse(localProg); }catch(e5){} }
         syncStatus.value = 'err';
       }
     }
@@ -1373,8 +1655,11 @@ const app = createApp({
     async function syncToCloud() {
       syncStatus.value = 'syncing';
       try {
-        await pushCloud(logs.value);
+        await pushCloud(logs.value, workLogs.value, issues.value, progresses.value);
         localStorage.setItem('chengtong_logs', JSON.stringify(logs.value));
+        localStorage.setItem('chengtong_worklogs', JSON.stringify(workLogs.value));
+        localStorage.setItem('chengtong_issues', JSON.stringify(issues.value));
+        localStorage.setItem('chengtong_progresses', JSON.stringify(progresses.value));
         syncStatus.value = 'ok';
         syncTime.value = dayjs().format('HH:mm');
       } catch(e) {
@@ -1407,14 +1692,40 @@ const app = createApp({
       return [...s];
     });
 
+    // 联系人展开状态（独立于 computed，避免每次重算重置）
+    const contactOpenState = reactive({});
+
+    const contactGroups = computed(()=>{
+      const map = {};
+      logs.value.forEach(l=>{
+        (l.contacts||[]).forEach(c=>{
+          const key = c.project || l.projectName || '';
+          if(!map[key]) map[key] = { project:key, contacts:[] };
+          // 去重
+          if(!map[key].contacts.some(x=>x.name===c.name && x.contact===c.contact)) {
+            map[key].contacts.push({ name:c.name, contact:c.contact, project:c.project||'' });
+          }
+        });
+      });
+      return Object.values(map);
+    });
+
+    function toggleContactGroup(project) {
+      contactOpenState[project] = !contactOpenState[project];
+    }
+
+    function isContactGroupOpen(project) {
+      return !!contactOpenState[project];
+    }
+
     function resetFilter(){ Object.assign(filter,{dateFrom:'',dateTo:'',keyword:'',project:''}); }
 
-    // === 城市联动 ===
-    const currentProvinces = computed(()=> Object.keys(CITY_DATA[form.regionType]||{}).sort() );
-    const currentCities = computed(()=>{
-      const map = CITY_DATA[form.regionType]||{};
-      return map[form.province] || [];
-    });
+    // === 计算属性 - 不再依赖城市联动 ===
+    // totalOtherExpense: 所有出差记录中的其他个人消费合计
+    const totalOtherExpense = computed(()=> fl().reduce((s,l)=>{
+      const otherExp = (l.otherExpenses||[]).reduce((ss,o)=>ss+(o.amount||0),0);
+      return s + otherExp;
+    },0));
 
     // === 计算 ===
     function calcDays() {
@@ -1424,7 +1735,7 @@ const app = createApp({
       } else { form.days = 0; }
     }
     function calcSubsidyTotal() {
-      if(form.subsidyType==='custom') return form.customSubsidy||0;
+      if(form.subsidyType==='custom') return (form.customSubsidy||0) * form.days;
       return (form.subsidyAmount||0) * form.days;
     }
     function calcTransportTotal() { return (form.transports||[]).reduce((s,t)=>s+(t.price||0),0); }
@@ -1449,7 +1760,12 @@ const app = createApp({
       if(form.hotelAA && form.roommateCount>1 && form.hotelPrice>0 && form.days>0) {
         hotel = form.hotelPrice * form.days / form.roommateCount;
       }
-      return hotel + calcPersonalMealCost(form.meals);
+      const otherExp = (form.otherExpenses||[]).reduce((s,o)=>s+(o.amount||0),0);
+      return hotel + calcPersonalMealCost(form.meals) + otherExp;
+    }
+
+    function calcOtherExpenseTotal() {
+      return (form.otherExpenses||[]).reduce((s,o)=>s+(o.amount||0),0);
     }
 
     // === 模态框 ===
@@ -1480,7 +1796,7 @@ const app = createApp({
       if(!form.startDate||!form.endDate) return alert('请填写起止日期');
       calcDays();
       const sub = calcSubsidyTotal(), tr = calcTransportTotal(), me = calcMealTotal(),
-            en = calcEntertainTotal(), ad = calcAdvanceTotal(),
+            en = calcEntertainTotal(), ad = calcAdvanceTotal(), oe = calcOtherExpenseTotal(),
             pm = calcPersonalMealCost(form.meals);
       let ph = 0;
       if(form.hotelAA && form.roommateCount>1 && form.hotelPrice>0 && form.days>0) ph = form.hotelPrice*form.days/form.roommateCount;
@@ -1498,11 +1814,12 @@ const app = createApp({
         meals:JSON.parse(JSON.stringify(form.meals)),
         entertains:JSON.parse(JSON.stringify(form.entertains)),
         advances:JSON.parse(JSON.stringify(form.advances)),
+        otherExpenses:JSON.parse(JSON.stringify(form.otherExpenses)),
         reimbursed: form.reimbursed||false,
         subsidyTotal:sub, totalTransport:tr, totalMeal:me,
-        totalEntertain:en, totalAdvance:ad,
+        totalEntertain:en, totalAdvance:ad, totalOtherExpense:oe,
         reimbursementTotal: sub+tr+(me-pm)+en+ad,
-        personalHotelCost:ph, personalMealCost:pm, personalTotal:ph+pm
+        personalHotelCost:ph, personalMealCost:pm, personalTotal:ph+pm+oe
       };
 
       if(editingId.value) {
@@ -1526,6 +1843,211 @@ const app = createApp({
     function toggleReimbursed(log) {
       log.reimbursed = !log.reimbursed;
       syncToCloud();
+    }
+
+    // === 工作日志 CRUD ===
+    const sortedWorkLogs = computed(()=> {
+      return [...workLogs.value].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    });
+
+    function openWorkLogForm(w) {
+      if(w) {
+        editingWorkLogId.value = w.id;
+        Object.assign(workLogForm, { id:w.id, date:w.date, type:w.type, content:w.content, participants:w.participants||'', location:w.location||'' });
+      } else {
+        editingWorkLogId.value = null;
+        Object.assign(workLogForm, { id:'', date:dayjs().format('YYYY-MM-DD'), type:'现场勘察', content:'', participants:'', location:'' });
+      }
+      showWorkLogModal.value = true;
+    }
+
+    function saveWorkLog() {
+      if(!workLogForm.date) return alert('请填写日期');
+      const obj = { ...workLogForm, id: editingWorkLogId.value || genId() };
+      if(editingWorkLogId.value) {
+        const idx = workLogs.value.findIndex(w=>w.id===editingWorkLogId.value);
+        if(idx>=0) workLogs.value[idx] = obj;
+      } else {
+        workLogs.value.push(obj);
+      }
+      showWorkLogModal.value = false;
+      syncToCloud();
+    }
+
+    function deleteWorkLog(id) {
+      if(!confirm('确定删除此工作日志？')) return;
+      workLogs.value = workLogs.value.filter(w=>w.id!==id);
+      syncToCloud();
+    }
+
+    // === 工作日志导出 ===
+    function exportWorkLogExcel() {
+      showWorkLogExport.value = false;
+      if(!sortedWorkLogs.value.length) return alert('暂无工作日志可导出');
+      const wb = XLSX.utils.book_new();
+      const data = sortedWorkLogs.value.map(w=>({
+        '日期':w.date||'','工作类型':w.type||'','工作内容':w.content||'',
+        '参与人员':w.participants||'','工作地点':w.location||''
+      }));
+      XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(data),'工作日志');
+      XLSX.writeFile(wb,'工作日志_'+dayjs().format('YYYYMMDD')+'.xlsx');
+    }
+
+    function exportWorkLogWord() {
+      showWorkLogExport.value = false;
+      if(!sortedWorkLogs.value.length) return alert('暂无工作日志可导出');
+      const rows = sortedWorkLogs.value.map(w=>`<tr>
+        <td style="width:90px">${w.date||'-'}</td>
+        <td style="width:80px">${w.type||'-'}</td>
+        <td>${w.content||'-'}</td>
+        <td style="width:100px">${w.participants||'-'}</td>
+        <td style="width:100px">${w.location||'-'}</td>
+      </tr>`).join('');
+      const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+      <head><meta charset="utf-8"><title>工作日志</title>
+      <style>body{font-family:'SimSun',serif;font-size:12pt}table{border-collapse:collapse;width:100%}th,td{border:1px solid #333;padding:6px 8px;text-align:left;vertical-align:top}th{background:#d9e2f3;text-align:center}h2{text-align:center}</style></head>
+      <body><h2>成通公司工作日志</h2><p style="text-align:center;color:#666">导出日期：${dayjs().format('YYYY-MM-DD HH:mm')}</p>
+      <table><tr><th>日期</th><th>工作类型</th><th>工作内容</th><th>参与人员</th><th>工作地点</th></tr>${rows}</table></body></html>`;
+      const blob = new Blob(['\ufeff'+html],{type:'application/msword'});
+      const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+      a.download='工作日志_'+dayjs().format('YYYYMMDD')+'.doc'; a.click();
+    }
+
+    // === 施工问题库 CRUD ===
+    const filteredIssues = computed(()=>{
+      let arr = issues.value;
+      if(issueFilter.status) arr = arr.filter(i=>i.status===issueFilter.status);
+      if(issueFilter.priority) arr = arr.filter(i=>i.priority===issueFilter.priority);
+      return arr.sort((a,b)=>(b.reportDate||'').localeCompare(a.reportDate||''));
+    });
+
+    function openIssueForm(iss) {
+      if(iss) {
+        editingIssueId.value = iss.id;
+        Object.assign(issueForm, {id:iss.id,title:iss.title,description:iss.description||'',project:iss.project||'',priority:iss.priority||'中',status:iss.status||'待处理',reportDate:iss.reportDate||'',handler:iss.handler||'',resolveDate:iss.resolveDate||''});
+      } else {
+        editingIssueId.value = null;
+        Object.assign(issueForm, {id:'',title:'',description:'',project:'',priority:'中',status:'待处理',reportDate:dayjs().format('YYYY-MM-DD'),handler:'',resolveDate:''});
+      }
+      showIssueModal.value = true;
+    }
+
+    function saveIssue() {
+      if(!issueForm.title) return alert('请填写问题标题');
+      const obj = { ...issueForm, id: editingIssueId.value || genId() };
+      if(editingIssueId.value) {
+        const idx = issues.value.findIndex(i=>i.id===editingIssueId.value);
+        if(idx>=0) issues.value[idx] = obj;
+      } else {
+        issues.value.push(obj);
+      }
+      showIssueModal.value = false;
+      syncToCloud();
+    }
+
+    function deleteIssue(id) {
+      if(!confirm('确定删除此问题？')) return;
+      issues.value = issues.value.filter(i=>i.id!==id);
+      syncToCloud();
+    }
+
+    // === 施工进度管理 CRUD ===
+    const sortedProgress = computed(()=>{
+      return [...progresses.value].sort((a,b)=>(b.plannedStart||'').localeCompare(a.plannedStart||''));
+    });
+
+    function openProgressForm(pg) {
+      if(pg) {
+        editingProgressId.value = pg.id;
+        Object.assign(progressForm, {id:pg.id,taskName:pg.taskName,project:pg.project||'',progress:pg.progress||0,plannedStart:pg.plannedStart||'',plannedEnd:pg.plannedEnd||'',actualEnd:pg.actualEnd||'',responsible:pg.responsible||'',remark:pg.remark||''});
+      } else {
+        editingProgressId.value = null;
+        Object.assign(progressForm, {id:'',taskName:'',project:'',progress:0,plannedStart:'',plannedEnd:'',actualEnd:'',responsible:'',remark:''});
+      }
+      showProgressModal.value = true;
+    }
+
+    function saveProgress() {
+      if(!progressForm.taskName) return alert('请填写任务名称');
+      const p = Math.max(0, Math.min(100, progressForm.progress||0));
+      const obj = { ...progressForm, progress: p, id: editingProgressId.value || genId() };
+      if(editingProgressId.value) {
+        const idx = progresses.value.findIndex(x=>x.id===editingProgressId.value);
+        if(idx>=0) progresses.value[idx] = obj;
+      } else {
+        progresses.value.push(obj);
+      }
+      showProgressModal.value = false;
+      syncToCloud();
+    }
+
+    function deleteProgress(id) {
+      if(!confirm('确定删除此进度记录？')) return;
+      progresses.value = progresses.value.filter(x=>x.id!==id);
+      syncToCloud();
+    }
+
+    // === 施工问题库导出 ===
+    function exportIssueExcel() {
+      showIssueExport.value = false;
+      if(!filteredIssues.value.length) return alert('暂无问题可导出');
+      const wb = XLSX.utils.book_new();
+      const data = filteredIssues.value.map(i=>({
+        '问题标题':i.title||'','所属项目':i.project||'','优先级':i.priority||'','状态':i.status||'',
+        '详细描述':i.description||'','上报日期':i.reportDate||'','处理人':i.handler||'','解决日期':i.resolveDate||''
+      }));
+      XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(data),'施工问题库');
+      XLSX.writeFile(wb,'施工问题库_'+dayjs().format('YYYYMMDD')+'.xlsx');
+    }
+
+    function exportIssueWord() {
+      showIssueExport.value = false;
+      if(!filteredIssues.value.length) return alert('暂无问题可导出');
+      const rows = filteredIssues.value.map(i=>`<tr>
+        <td>${i.title||'-'}</td><td>${i.project||'-'}</td><td>${i.priority||'-'}</td>
+        <td>${i.status||'-'}</td><td>${i.description||'-'}</td><td>${i.reportDate||'-'}</td>
+        <td>${i.handler||'-'}</td><td>${i.resolveDate||'-'}</td>
+      </tr>`).join('');
+      const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+      <head><meta charset="utf-8"><title>施工问题库</title>
+      <style>body{font-family:'SimSun',serif;font-size:12pt}table{border-collapse:collapse;width:100%}th,td{border:1px solid #333;padding:6px 8px;text-align:left;vertical-align:top}th{background:#d9e2f3;text-align:center}h2{text-align:center}</style></head>
+      <body><h2>施工问题库</h2><p style="text-align:center;color:#666">导出日期：${dayjs().format('YYYY-MM-DD HH:mm')}</p>
+      <table><tr><th>问题标题</th><th>所属项目</th><th>优先级</th><th>状态</th><th>描述</th><th>上报日期</th><th>处理人</th><th>解决日期</th></tr>${rows}</table></body></html>`;
+      const blob = new Blob(['\ufeff'+html],{type:'application/msword'});
+      const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+      a.download='施工问题库_'+dayjs().format('YYYYMMDD')+'.doc'; a.click();
+    }
+
+    // === 施工进度导出 ===
+    function exportProgressExcel() {
+      showProgressExport.value = false;
+      if(!sortedProgress.value.length) return alert('暂无进度可导出');
+      const wb = XLSX.utils.book_new();
+      const data = sortedProgress.value.map(p=>({
+        '任务名称':p.taskName||'','所属项目':p.project||'','进度(%)':p.progress||0,
+        '计划开始':p.plannedStart||'','计划结束':p.plannedEnd||'','实际完成':p.actualEnd||'',
+        '负责人':p.responsible||'','备注':p.remark||''
+      }));
+      XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(data),'施工进度');
+      XLSX.writeFile(wb,'施工进度_'+dayjs().format('YYYYMMDD')+'.xlsx');
+    }
+
+    function exportProgressWord() {
+      showProgressExport.value = false;
+      if(!sortedProgress.value.length) return alert('暂无进度可导出');
+      const rows = sortedProgress.value.map(p=>`<tr>
+        <td>${p.taskName||'-'}</td><td>${p.project||'-'}</td><td>${p.progress>=100?'已完成':p.progress+'%'}</td>
+        <td>${p.plannedStart||'-'}</td><td>${p.plannedEnd||'-'}</td><td>${p.actualEnd||'-'}</td>
+        <td>${p.responsible||'-'}</td><td>${p.remark||'-'}</td>
+      </tr>`).join('');
+      const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+      <head><meta charset="utf-8"><title>施工进度管理</title>
+      <style>body{font-family:'SimSun',serif;font-size:12pt}table{border-collapse:collapse;width:100%}th,td{border:1px solid #333;padding:6px 8px;text-align:left;vertical-align:top}th{background:#d9e2f3;text-align:center}h2{text-align:center}</style></head>
+      <body><h2>施工进度管理</h2><p style="text-align:center;color:#666">导出日期：${dayjs().format('YYYY-MM-DD HH:mm')}</p>
+      <table><tr><th>任务名称</th><th>所属项目</th><th>进度</th><th>计划开始</th><th>计划结束</th><th>实际完成</th><th>负责人</th><th>备注</th></tr>${rows}</table></body></html>`;
+      const blob = new Blob(['\ufeff'+html],{type:'application/msword'});
+      const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+      a.download='施工进度_'+dayjs().format('YYYYMMDD')+'.doc'; a.click();
     }
 
     // === 模板 ===
@@ -1564,61 +2086,16 @@ const app = createApp({
     const totalUnreimbursed = computed(()=> fl().filter(l=>!l.reimbursed).reduce((s,l)=>s+(l.reimbursementTotal||0),0));
     const totalReimbursed = computed(()=> fl().filter(l=>l.reimbursed).reduce((s,l)=>s+(l.reimbursementTotal||0),0));
 
-    // === 联系人 ===
-    const contactGroups = computed(()=>{
-      const map = {};
-      fl().forEach(l=>{
-        (l.contacts||[]).forEach(c=>{
-          if(!c.name&&!c.contact) return;
-          const proj = c.project||'未分类';
-          if(!map[proj]) map[proj]={project:proj,contacts:[],open:true};
-          if(!map[proj].contacts.some(x=>x.name===c.name&&x.contact===c.contact)) map[proj].contacts.push(c);
-        });
-      });
-      return Object.values(map);
-    });
+    // === 记账汇总 ===
+    const totalTransport = computed(()=> fl().reduce((s,l)=>s+(l.totalTransport||0),0));
+    const totalHotel = computed(()=> fl().reduce((s,l)=>s+((l.hotelPrice||0)*(l.days||0)),0));
+    const totalMeal = computed(()=> fl().reduce((s,l)=>s+(l.totalMeal||0),0));
+    const totalSubsidy = computed(()=> fl().reduce((s,l)=>s+(l.subsidyTotal||0),0));
+    const totalEntertain = computed(()=> fl().reduce((s,l)=>s+(l.totalEntertain||0),0));
+    const totalAdvance = computed(()=> fl().reduce((s,l)=>s+(l.totalAdvance||0),0));
 
     // === 图表 ===
-    function renderCharts(){ renderSankey(); renderBarChart(); }
-
-    function renderSankey(){
-      if(!sankeyChartEl.value) return;
-      if(!sankeyChart) sankeyChart = echarts.init(sankeyChartEl.value);
-      const data = fl();
-      const totals = {
-        transport: data.reduce((s,l)=>s+(l.totalTransport||0),0),
-        meal: data.reduce((s,l)=>s+(l.totalMeal||0),0),
-        entertain: data.reduce((s,l)=>s+(l.totalEntertain||0),0),
-        advance: data.reduce((s,l)=>s+(l.totalAdvance||0),0),
-        subsidy: data.reduce((s,l)=>s+(l.subsidyTotal||0),0)
-      };
-      const grand = Object.values(totals).reduce((a,b)=>a+b,0);
-      sankeyChart.setOption({
-        tooltip:{trigger:'item',formatter:p=>p.dataType==='edge'?p.data.source+' → '+p.data.target+': ¥'+fmt(p.data.value):''},
-        series:[{
-          type:'sankey',layout:'none',emphasis:{focus:'adjacency'},
-          nodeGap:16,nodeWidth:20,
-          label:{color:'#e8e0ff',fontSize:11},
-          lineStyle:{color:'gradient',opacity:.4,curveness:.5},
-          itemStyle:{borderWidth:0},
-          data:[
-            {name:'总支出\n¥'+fmt(grand),itemStyle:{color:'#6240b0'}},
-            {name:'交通\n¥'+fmt(totals.transport),itemStyle:{color:'#3b82f6'}},
-            {name:'用餐\n¥'+fmt(totals.meal),itemStyle:{color:'#f59e0b'}},
-            {name:'招待\n¥'+fmt(totals.entertain),itemStyle:{color:'#ef4444'}},
-            {name:'垫资\n¥'+fmt(totals.advance),itemStyle:{color:'#22c55e'}},
-            {name:'补贴\n¥'+fmt(totals.subsidy),itemStyle:{color:'#a855f7'}}
-          ],
-          links:[
-            {source:'总支出\n¥'+fmt(grand),target:'交通\n¥'+fmt(totals.transport),value:Math.max(1,totals.transport)},
-            {source:'总支出\n¥'+fmt(grand),target:'用餐\n¥'+fmt(totals.meal),value:Math.max(1,totals.meal)},
-            {source:'总支出\n¥'+fmt(grand),target:'招待\n¥'+fmt(totals.entertain),value:Math.max(1,totals.entertain)},
-            {source:'总支出\n¥'+fmt(grand),target:'垫资\n¥'+fmt(totals.advance),value:Math.max(1,totals.advance)},
-            {source:'总支出\n¥'+fmt(grand),target:'补贴\n¥'+fmt(totals.subsidy),value:Math.max(1,totals.subsidy)}
-          ]
-        }]
-      });
-    }
+    function renderCharts(){ renderBarChart(); }
 
     function renderBarChart(){
       if(!barChartEl.value) return;
@@ -1728,26 +2205,36 @@ const app = createApp({
       }
       loadTemplates();
       nextTick(()=>renderCharts());
-      window.addEventListener('resize',()=>{ sankeyChart&&sankeyChart.resize(); barChart&&barChart.resize(); });
+      window.addEventListener('resize',()=>{ barChart&&barChart.resize(); });
     });
 
     // 点击外部关闭导出下拉
-    document.addEventListener('click',e=>{ if(!e.target.closest('.export-wrap')) showExport.value=false; });
+    document.addEventListener('click',e=>{ if(!e.target.closest('.export-wrap')) { showExport.value=false; showWorkLogExport.value=false; showIssueExport.value=false; showProgressExport.value=false; } });
 
     return {
-      logs, showModal, editingId, form, sections, filter,
-      isReadOnly, showExport, syncStatus, syncTime, syncLabel,
+      logs, workLogs, showModal, showWorkLogModal, editingId, editingWorkLogId,
+      showIssueModal, showProgressModal, editingIssueId, editingProgressId,
+      showIssueFilter, issueFilter,
+      form, workLogForm, issueForm, progressForm, sections, filter,
+      issues, progresses,
+      isReadOnly, showExport, showWorkLogExport, showIssueExport, showProgressExport, workTab,
+      hideAmounts, syncStatus, syncTime, syncLabel,
       barGroupBy, selectedTpl, templates,
-      sankeyChartEl, barChartEl,
-      filteredLogs, projectTags, currentProvinces, currentCities,
+      barChartEl,
+      filteredLogs, projectTags, contactGroups, toggleContactGroup, isContactGroupOpen, sortedWorkLogs, filteredIssues, sortedProgress,
       totalPersonalHotel, totalPersonalMeal, totalUnreimbursed, totalReimbursed,
-      contactGroups,
+      totalOtherExpense,
+      totalTransport, totalHotel, totalMeal, totalSubsidy, totalEntertain, totalAdvance,
       resetFilter, loadFromCloud,
-      calcDays, calcSubsidyTotal, calcTransportTotal, calcMealTotal,
+      calcDays, calcSubsidyTotal, calcTransportTotal, calcMealTotal, calcOtherExpenseTotal,
       calcReimbursementTotal, calcPersonalTotal, isMe,
       openCreate, openEdit, toggleSection,
       addTransport, addMeal, addContact,
       saveLog, deleteLog, toggleReimbursed,
+      openWorkLogForm, saveWorkLog, deleteWorkLog,
+      exportWorkLogExcel, exportWorkLogWord,
+      openIssueForm, saveIssue, deleteIssue, exportIssueExcel, exportIssueWord,
+      openProgressForm, saveProgress, deleteProgress, exportProgressExcel, exportProgressWord,
       saveTemplate, loadTemplates, applyTemplate,
       exitReadOnly, renderCharts, renderBarChart,
       exportExcel, exportWord, exportPDF, fmt
