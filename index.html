@@ -234,16 +234,108 @@ textarea{resize:vertical;min-height:60px}
 /* ===== 主布局 ===== */
 .main-layout{
   flex:1;
-  display:grid;
-  grid-template-columns:1fr 380px;
-  gap:16px;
-  padding:16px;
+  display:flex;
+  flex-direction:column;
+  padding:0;
   max-width:1600px;
   margin:0 auto;
   width:100%;
+  overflow:hidden;
 }
-.left-panel{display:flex;flex-direction:column;gap:12px;min-width:0}
-.right-panel{display:flex;flex-direction:column;gap:12px;min-width:0}
+.page-content{
+  flex:1;
+  overflow-y:auto;
+  padding:16px;
+  padding-bottom:calc(16px + 70px);
+  -webkit-overflow-scrolling:touch;
+}
+.page-content::-webkit-scrollbar{width:4px}
+.page-content::-webkit-scrollbar-thumb{background:#6240b040;border-radius:2px}
+
+/* ===== 底部Tab导航 ===== */
+.bottom-nav{
+  position:fixed;
+  bottom:0;left:0;right:0;
+  z-index:200;
+  background:linear-gradient(180deg,#110b30f0 0%,#0d0a25f8 100%);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  border-top:1px solid var(--glass-border);
+  display:flex;
+  padding:0;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  height:calc(60px + env(safe-area-inset-bottom,0px));
+}
+.bottom-nav::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent 5%,var(--primary)25%,var(--gold)50%,var(--primary)75%,transparent 95%);
+  opacity:.5;
+}
+.nav-item{
+  flex:1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;
+  cursor:pointer;
+  transition:all var(--transition);
+  position:relative;
+  padding-top:6px;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+.nav-item-icon{font-size:1.35rem;line-height:1;transition:transform .2s}
+.nav-item-label{font-size:.65rem;color:var(--text-dim);transition:color .2s;font-weight:500;letter-spacing:.02em}
+.nav-item.active .nav-item-icon{transform:scale(1.12)}
+.nav-item.active .nav-item-label{color:var(--primary-light);font-weight:600}
+.nav-item.active::before{
+  content:'';position:absolute;top:-1px;left:25%;right:25%;height:3px;
+  background:linear-gradient(90deg,var(--primary-light),var(--gold));
+  border-radius:0 0 3px 3px;
+}
+
+/* 桌面端：底部Tab变为顶部水平导航 */
+@media(min-width:769px){
+  .bottom-nav{
+    position:static;
+    bottom:auto;left:auto;right:auto;transform:none;
+    max-width:none;
+    border-radius:0;
+    border-left:none;border-right:none;
+    border-top:none;
+    background:linear-gradient(90deg,#110b30f0 0%,#1a0e3acc 100%);
+    backdrop-filter:blur(24px);
+    -webkit-backdrop-filter:blur(24px);
+    height:auto;
+    padding:0;
+    padding-bottom:0;
+    border-bottom:1px solid var(--glass-border);
+  }
+  .bottom-nav::before{
+    top:auto;bottom:0;
+    background:linear-gradient(90deg,transparent 5%,var(--primary)25%,var(--gold)50%,var(--primary)75%,transparent 95%);
+  }
+  .nav-item{
+    flex:1;
+    flex-direction:row;
+    gap:8px;
+    padding:14px 24px;
+    border-bottom:2px solid transparent;
+  }
+  .nav-item-icon{font-size:1.15rem}
+  .nav-item-label{font-size:.82rem}
+  .nav-item.active::before{
+    top:auto;bottom:-1px;
+    left:0;right:0;
+    width:auto;
+    height:2px;
+    border-radius:0;
+  }
+  .page-content{padding-bottom:16px !important}
+  .main-layout{flex-direction:column}
+}
+
+/* ===== Tab页面内容器 ===== */
+.tab-page{display:none;flex-direction:column;gap:12px}
+.tab-page.active{display:flex}
 
 /* ===== 搜索区 ===== */
 .search-bar{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end}
@@ -256,7 +348,7 @@ textarea{resize:vertical;min-height:60px}
 .tag-btn:hover,.tag-btn.active{background:#6240b040;border-color:var(--primary-light);color:var(--primary-light)}
 
 /* ===== 日志卡片 ===== */
-.log-list{display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 220px);overflow-y:auto;padding-right:4px}
+.log-list{display:flex;flex-direction:column;gap:10px;overflow-y:auto;padding-right:4px;flex:1}
 .log-card{
   background:var(--glass);border:1px solid var(--glass-border);
   backdrop-filter:blur(12px);border-radius:var(--radius);
@@ -420,10 +512,6 @@ textarea{resize:vertical;min-height:60px}
 .chart-header select{width:auto;padding:4px 8px;font-size:.78rem}
 
 /* ===== 响应式 ===== */
-@media(max-width:1024px){
-  .main-layout{grid-template-columns:1fr}
-  .right-panel{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-}
 @media(max-width:640px){
   /* ===== 头部精简 ===== */
   .header{padding:0 14px;height:56px}
@@ -440,14 +528,14 @@ textarea{resize:vertical;min-height:60px}
   .export-wrap .btn-ghost{font-size:.75rem;padding:5px 8px}
 
   /* ===== 主体布局 ===== */
-  .main-layout{padding:12px;gap:12px}
+  .page-content{padding:12px;padding-bottom:calc(12px + 74px)}
 
   /* ===== 搜索栏 - 全部单列 ===== */
   .search-bar{grid-template-columns:1fr 1fr auto !important;gap:6px}
   .search-bar input,.search-bar select{font-size:16px !important;padding:10px 12px !important}
 
   /* ===== 日志卡片 ===== */
-  .log-list{max-height:calc(100vh - 280px);gap:8px}
+  .log-list{max-height:none;gap:8px}
   .log-card{padding:12px 14px}
   .log-card-title{font-size:.88rem}
 
@@ -516,14 +604,11 @@ textarea{resize:vertical;min-height:60px}
   /* ===== 统计卡片 ===== */
   .stat-grid{grid-template-columns:1fr 1fr;gap:8px}
 
-  /* ===== 右侧面板 ===== */
-  .right-panel{grid-template-columns:1fr}
+  /* ===== Badge ===== */
+  .badge{font-size:.7rem;padding:2px 6px}
 
   /* ===== Filter tags ===== */
   .tag-btn{padding:6px 14px;font-size:.82rem}
-
-  /* ===== Badge ===== */
-  .badge{font-size:.7rem;padding:2px 6px}
 }
 
 /* ===== 动画 ===== */
@@ -543,19 +628,22 @@ textarea{resize:vertical;min-height:60px}
 .mb-8{margin-bottom:8px}
 
 /* ===== 个人记账卡片 ===== */
-.expense-summary-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.expense-cat{
-  background:#ffffff08;border:1px solid var(--glass-border);border-radius:10px;
-  padding:10px 8px;text-align:center;
-  transition:all var(--transition);
+.expense-summary-list{display:flex;flex-direction:column;gap:10px}
+.expense-row{
+  display:flex;align-items:center;gap:10px;
 }
-.expense-cat:hover{background:#ffffff12;border-color:#6240b050}
-.expense-cat-icon{font-size:1.3rem;margin-bottom:4px}
-.expense-cat-label{font-size:.72rem;color:var(--text-muted);margin-bottom:2px}
-.expense-cat-val{font-size:.92rem;font-weight:700;color:var(--text)}
-@media(max-width:640px){
-  .expense-summary-grid{grid-template-columns:1fr !important;gap:8px}
+.expense-row-icon{font-size:1.1rem;flex-shrink:0;width:28px;text-align:center}
+.expense-row-body{flex:1;min-width:0}
+.expense-row-label{font-size:.78rem;color:var(--text-muted);margin-bottom:3px}
+.expense-row-bar{height:6px;border-radius:3px;background:#ffffff10;overflow:hidden}
+.expense-row-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.expense-row-val{font-size:.88rem;font-weight:700;color:var(--text);flex-shrink:0;min-width:70px;text-align:right}
+.expense-total-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding-top:12px;border-top:1px solid var(--glass-border);margin-top:4px;
 }
+.expense-total-label{font-size:.82rem;color:var(--text-muted)}
+.expense-total-val{font-size:1.05rem;font-weight:700;color:var(--danger)}
 
 /* ===== 金额脱敏 ===== */
 .amount-masked{color:var(--text-muted);letter-spacing:.15em;font-size:.85em}
@@ -592,7 +680,7 @@ textarea{resize:vertical;min-height:60px}
 @media(max-width:640px){
   .fab-create{
     display:flex;align-items:center;justify-content:center;
-    position:fixed;right:20px;bottom:24px;z-index:90;
+    position:fixed;right:20px;bottom:calc(70px + 12px);z-index:90;
     width:56px;height:56px;border-radius:50%;border:none;
     background:linear-gradient(135deg,var(--primary),var(--primary-light));
     color:#fff;font-size:1.5rem;cursor:pointer;
@@ -603,6 +691,66 @@ textarea{resize:vertical;min-height:60px}
   .fab-create:hover{transform:scale(1.08);box-shadow:0 6px 28px #6240b080}
   .fab-create:active{transform:scale(.95)}
   @keyframes fabPulse{0%,100%{box-shadow:0 4px 20px #6240b060,0 8px 32px #00000040}50%{box-shadow:0 4px 28px #6240b0a0,0 8px 40px #00000050}}
+}
+
+/* ===== 发票管理 ===== */
+.inv-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.inv-stat{text-align:center;padding:10px 6px;border-radius:var(--radius-sm);background:#ffffff08}
+.inv-stat-val{font-size:1.15rem;font-weight:700;color:#fff}
+.inv-stat-label{font-size:.7rem;color:var(--text-muted);margin-top:2px}
+.inv-cats{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.inv-cat-chip{padding:6px 12px;border-radius:20px;font-size:.78rem;cursor:pointer;border:1px solid var(--glass-border);background:var(--glass);transition:all var(--transition);color:var(--text-muted)}
+.inv-cat-chip.active{border-color:var(--primary-light);color:#fff;background:#6240b040}
+.inv-cat-chip:hover{border-color:var(--primary-light)}
+.inv-toolbar{display:flex;gap:8px;margin-bottom:12px;align-items:center}
+.inv-search{flex:1;background:#ffffff0d;border:1px solid var(--glass-border);border-radius:var(--radius-sm);color:var(--text);font-size:.82rem;padding:7px 10px;outline:none}
+.inv-search::placeholder{color:var(--text-dim)}
+.inv-search:focus{border-color:var(--primary-light)}
+.inv-list{display:flex;flex-direction:column;gap:8px}
+.inv-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);background:#ffffff06;border:1px solid transparent;transition:all var(--transition);cursor:pointer}
+.inv-item:hover{background:#ffffff0e;border-color:var(--glass-border)}
+.inv-item-icon{font-size:1.2rem;flex-shrink:0;width:28px;text-align:center}
+.inv-item-body{flex:1;min-width:0}
+.inv-item-title{font-size:.84rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.inv-item-meta{font-size:.72rem;color:var(--text-muted);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap}
+.inv-item-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.inv-item-amount{font-size:.88rem;font-weight:700;color:var(--gold)}
+.inv-status{padding:3px 8px;border-radius:10px;font-size:.68rem;font-weight:600;white-space:nowrap}
+.inv-status.pending{background:#f59e0b25;color:var(--warning)}
+.inv-status.approved{background:#22c55e25;color:var(--success)}
+.inv-status.rejected{background:#ef444425;color:var(--danger)}
+.inv-empty{text-align:center;padding:28px 16px;color:var(--text-dim);font-size:.82rem}
+.inv-empty-icon{font-size:2rem;margin-bottom:8px;opacity:.35}
+.inv-img-thumb{width:40px;height:40px;border-radius:6px;object-fit:cover;border:1px solid var(--glass-border);flex-shrink:0;cursor:pointer}
+.inv-img-preview{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:20px}
+.inv-img-preview img{max-width:100%;max-height:100%;border-radius:8px;object-fit:contain}
+.inv-img-preview-close{position:absolute;top:16px;right:20px;font-size:1.6rem;color:#fff;cursor:pointer;background:none;border:none;z-index:10}
+.inv-form-row{display:flex;gap:10px;margin-bottom:10px}
+.inv-form-group{flex:1;display:flex;flex-direction:column;gap:4px}
+.inv-form-label{font-size:.75rem;color:var(--text-muted);font-weight:500}
+.inv-form-group input,.inv-form-group select,.inv-form-group textarea{width:100%}
+.inv-upload-area{border:2px dashed var(--glass-border);border-radius:var(--radius-sm);padding:20px;text-align:center;cursor:pointer;transition:all var(--transition);margin-bottom:12px}
+.inv-upload-area:hover{border-color:var(--primary-light);background:#ffffff08}
+.inv-upload-area.has-img{padding:8px}
+.inv-upload-area img{max-width:100%;max-height:180px;border-radius:6px;object-fit:contain}
+.inv-ocr-status{font-size:.72rem;margin-top:6px;padding:4px 8px;border-radius:4px;display:inline-block}
+.inv-ocr-status.loading{background:#3b82f620;color:var(--info)}
+.inv-ocr-status.done{background:#22c55e20;color:var(--success)}
+.inv-ocr-status.fail{background:#ef444420;color:var(--danger)}
+.inv-ocr-status:not(.has-status){display:none}
+.inv-type-select{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.inv-type-opt{padding:6px 12px;border-radius:var(--radius-sm);font-size:.78rem;cursor:pointer;border:1px solid var(--glass-border);background:var(--glass);color:var(--text-muted);transition:all var(--transition)}
+.inv-type-opt.active{border-color:var(--primary-light);color:#fff;background:#6240b050}
+.inv-confirm-bar{display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--glass-border)}
+.inv-project-tag{font-size:.68rem;padding:2px 6px;border-radius:4px;background:var(--primary-dark);color:var(--primary-light);white-space:nowrap}
+.inv-reject-reason{margin-top:8px}
+.inv-reject-reason input{width:100%;font-size:.78rem}
+@media(max-width:640px){
+  .inv-stats{grid-template-columns:repeat(3,1fr);gap:6px}
+  .inv-stat-val{font-size:1rem}
+  .inv-form-row{flex-direction:column;gap:8px}
+  .inv-cats{gap:6px}
+  .inv-cat-chip{padding:5px 10px;font-size:.74rem}
 }
 </style>
 </head>
@@ -643,9 +791,24 @@ textarea{resize:vertical;min-height:60px}
         📤 导出 ▾
       </button>
       <div v-if="showExport" class="export-dropdown">
-        <button @click="exportExcel">📊 Excel (三表)</button>
-        <button @click="exportWord">📝 Word 文档</button>
-        <button @click="exportPDF">🖨️ 打印/PDF</button>
+        <!-- 出差记录相关 -->
+        <template v-if="activeTab==='home'||activeTab==='records'||activeTab==='more'">
+          <button @click="exportExcel">📊 出差记录 Excel</button>
+          <button @click="exportWord">📝 出差记录 Word</button>
+          <button @click="exportPDF">🖨️ 打印/PDF</button>
+          <template v-if="activeTab==='more'">
+            <div style="border-top:1px solid #ffffff15;margin:4px 0"></div>
+            <button @click="exportInvoiceExcel" style="color:var(--primary-light)">📊 发票明细 Excel</button>
+          </template>
+        </template>
+        <!-- 项目施工相关 -->
+        <template v-else-if="activeTab==='project'">
+          <button @click="exportCurrentExcel">📊 导出{{ workTab==='worklog'?'工作日志':workTab==='issues'?'问题库':'施工进度' }} Excel</button>
+          <button @click="exportCurrentWord">📝 导出{{ workTab==='worklog'?'工作日志':workTab==='issues'?'问题库':'施工进度' }} Word</button>
+          <div style="border-top:1px solid #ffffff15;margin:4px 0"></div>
+          <button @click="exportAllProjectExcel" style="color:var(--primary-light)">📊 三表合一 Excel</button>
+          <button @click="exportAllProjectWord" style="color:var(--primary-light)">📝 三表合一 Word</button>
+        </template>
       </div>
     </div>
   </div>
@@ -653,348 +816,629 @@ textarea{resize:vertical;min-height:60px}
 
 <!-- ===== 主体 ===== -->
 <div class="main-layout">
-
-  <!-- ===== 左侧面板 ===== -->
-  <div class="left-panel">
-
-    <!-- 标题行 -->
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-      <div style="display:flex;align-items:center;gap:8px">
-        <h1 style="font-size:1.1rem;font-weight:700;color:#fff">出差日志</h1>
-        <span class="badge badge-primary">{{ filteredLogs.length }} 条</span>
-        <button class="btn btn-ghost btn-sm" @click="hideAmounts=!hideAmounts" :title="hideAmounts?'显示金额':'隐藏金额'" style="font-size:.78rem;padding:4px 8px">
-          {{ hideAmounts?'🔓':'🔒' }} {{ hideAmounts?'显示':'隐藏' }}
-        </button>
-      </div>
-      <button v-if="!isReadOnly" class="btn btn-primary btn-sm" @click="openCreate">
-        ✚ 新建出差
-      </button>
+  <!-- 导航（桌面端顶部/手机端底部，由CSS控制） -->
+  <nav class="bottom-nav">
+    <div class="nav-item" :class="{active:activeTab==='home'}" @click="activeTab='home'">
+      <span class="nav-item-icon">📊</span>
+      <span class="nav-item-label">首页</span>
     </div>
-
-    <!-- 搜索过滤 -->
-    <div class="card" style="padding:12px">
-      <div class="search-bar" style="grid-template-columns:1fr 1fr auto 1fr;align-items:end">
-        <div class="form-group">
-          <label class="form-label">开始日期</label>
-          <input type="date" v-model="filter.dateFrom">
-        </div>
-        <div class="form-group">
-          <label class="form-label">结束日期</label>
-          <input type="date" v-model="filter.dateTo">
-        </div>
-        <div style="display:flex;align-items:flex-end;padding-bottom:1px">
-          <button class="btn btn-ghost btn-sm" @click="resetFilter">重置</button>
-        </div>
-        <div class="form-group">
-          <label class="form-label">关键词搜索</label>
-          <input type="text" v-model="filter.keyword" placeholder="酒店/项目/内容/联系人…">
-        </div>
-      </div>
-      <div class="filter-tags" v-if="projectTags.length">
-        <span class="tag-btn" :class="{active:!filter.project}" @click="filter.project=''">全部</span>
-        <span v-for="tag in projectTags" :key="tag"
-          class="tag-btn" :class="{active:filter.project===tag}"
-          @click="filter.project=(filter.project===tag?'':tag)">{{ tag }}</span>
-      </div>
+    <div class="nav-item" :class="{active:activeTab==='records'}" @click="activeTab='records'">
+      <span class="nav-item-icon">📋</span>
+      <span class="nav-item-label">出差记录</span>
     </div>
+    <div class="nav-item" :class="{active:activeTab==='project'}" @click="activeTab='project'">
+      <span class="nav-item-icon">🔧</span>
+      <span class="nav-item-label">项目施工</span>
+    </div>
+    <div class="nav-item" :class="{active:activeTab==='more'}" @click="activeTab='more'">
+      <span class="nav-item-icon">⋯</span>
+      <span class="nav-item-label">更多</span>
+    </div>
+  </nav>
+  <div class="page-content">
 
-    <!-- 日志列表 -->
-    <div class="log-list">
-      <div v-if="filteredLogs.length===0" class="empty-state glass">
-        <div class="empty-icon">📋</div>
-        <div>暂无出差记录</div>
-        <button v-if="!isReadOnly" class="btn btn-primary btn-sm" @click="openCreate">新建出差</button>
-      </div>
-      <transition-group name="list">
-        <div v-for="log in filteredLogs" :key="log.id"
-          class="log-card" :class="{['reimbursed-card']:log.reimbursed}">
-          <div class="log-card-top">
-            <div>
-              <div class="log-card-title">
-                {{ log.hotelName || '(未填酒店)' }}
-              </div>
-              <div class="log-card-sub">
-                {{ log.projectName || '(未填项目)' }} &nbsp;|&nbsp;
-                {{ log.startDate }} ~ {{ log.endDate }} &nbsp;({{ log.days }}天)
-              </div>
-            </div>
-            <div class="log-card-actions" v-if="!isReadOnly">
-              <button class="btn-icon" title="编辑" @click="openEdit(log)">✏️</button>
-              <button class="btn-icon danger" title="删除" @click="deleteLog(log.id)">🗑️</button>
-            </div>
+    <!-- ========== Tab1: 首页仪表盘 ========== -->
+    <div class="tab-page" :class="{active:activeTab==='home'}">
+      <h1 style="font-size:1.15rem;font-weight:700;color:#fff;margin-bottom:4px">📊 出差概览</h1>
+
+      <!-- 最近出差（前3条） -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="panel-title" style="margin:0">🕐 最近出差</div>
+          <button class="btn btn-ghost btn-sm" @click="activeTab='records'" style="font-size:.75rem;padding:3px 8px">查看全部 →</button>
+        </div>
+        <div v-if="filteredLogs.length===0" style="text-align:center;color:var(--text-dim);font-size:.82rem;padding:16px 0">暂无出差记录</div>
+        <div v-for="log in filteredLogs.slice(0,3)" :key="log.id" style="padding:8px 0;border-bottom:1px solid var(--glass-border);display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.85rem;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ log.projectName || log.hotelName || '(未填)' }}</div>
+            <div style="font-size:.72rem;color:var(--text-muted);margin-top:2px">{{ log.startDate }} ~ {{ log.endDate }} · {{ log.days }}天</div>
           </div>
-          <div class="log-card-amounts">
-            <div class="amount-item"><span class="label">补贴</span><span class="val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+(log.subsidyTotal||0) }}</span></div>
-            <div class="amount-item"><span class="label">交通</span><span class="val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+(log.totalTransport||0) }}</span></div>
-            <div class="amount-item"><span class="label">用餐</span><span class="val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+(log.totalMeal||0) }}</span></div>
-            <div class="amount-item" v-if="(log.totalEntertain||0)>0"><span class="label">招待</span><span class="val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+log.totalEntertain }}</span></div>
-            <div class="amount-item" v-if="(log.totalAdvance||0)>0"><span class="label">垫资</span><span class="val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+log.totalAdvance }}</span></div>
-          </div>
-          <div class="log-card-footer">
-            <div>
-              <div class="reimburse-total">
-                <small>公司报销</small>{{ hideAmounts?'¥****':'¥'+fmt(log.reimbursementTotal||0) }}
-              </div>
-              <div class="personal-cost" v-if="(log.personalTotal||0)>0">
-                个人支出 {{ hideAmounts?'¥****':'¥'+fmt(log.personalTotal) }}
-              </div>
-            </div>
-            <label class="reimburse-check">
-              <input type="checkbox" :checked="log.reimbursed" @change="toggleReimbursed(log)">
-              已报销
-            </label>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:.85rem;font-weight:700;color:var(--gold)" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(log.reimbursementTotal||0) }}</div>
+            <span class="badge" :class="{'badge-success':log.reimbursed,'badge-gold':!log.reimbursed}" style="font-size:.62rem;padding:1px 6px">{{ log.reimbursed?'已报销':'待报销' }}</span>
           </div>
         </div>
-      </transition-group>
-    </div>
-  </div>
-
-  <!-- ===== 右侧面板 ===== -->
-  <div class="right-panel">
-
-    <!-- 个人出差记账 -->
-    <div class="card">
-      <div class="panel-title" style="margin-bottom:12px">📒 个人出差记账</div>
-      <div class="expense-summary-grid" style="grid-template-columns:1fr 1fr 1fr">
-        <div class="expense-cat">
-          <div class="expense-cat-icon">🏨</div>
-          <div class="expense-cat-label">住宿费</div>
-          <div class="expense-cat-val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalPersonalHotel) }}</div>
-        </div>
-        <div class="expense-cat">
-          <div class="expense-cat-icon">🍽️</div>
-          <div class="expense-cat-label">餐饮费</div>
-          <div class="expense-cat-val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalPersonalMeal) }}</div>
-        </div>
-        <div class="expense-cat">
-          <div class="expense-cat-icon">💰</div>
-          <div class="expense-cat-label">其他消费</div>
-          <div class="expense-cat-val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalOtherExpense) }}</div>
-        </div>
       </div>
-      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--glass-border)">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="color:var(--text-muted);font-size:.82rem">个人支出合计</span>
-          <span style="color:var(--danger);font-weight:700;font-size:1.05rem" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalPersonalHotel+totalPersonalMeal+totalOtherExpense) }}</span>
-        </div>
-      </div>
-    </div>
 
-    <!-- 报销柱状图 -->
-    <div class="card">
-      <div class="chart-header">
-        <div class="panel-title" style="margin:0">📊 报销概览</div>
-        <select v-model="barGroupBy" @change="renderBarChart" style="font-size:.78rem;padding:4px 8px;width:auto">
-          <option value="all">全部</option>
-          <option value="month">按月</option>
-          <option value="quarter">按季度</option>
-        </select>
-      </div>
-      <div class="chart-wrap-sm" ref="barChartEl"></div>
-    </div>
-
-    <!-- 报销状态 -->
-    <div class="card">
-      <div class="panel-title">📑 报销状态</div>
+      <!-- 核心统计卡片 -->
       <div class="stat-grid">
+        <div class="stat-item" style="cursor:pointer" @click="activeTab='records'">
+          <div class="s-val">{{ filteredLogs.length }}</div>
+          <div class="s-label">出差总次数</div>
+        </div>
         <div class="stat-item">
+          <div class="s-val" style="color:var(--warning)">{{ filteredLogs.reduce((s,l)=>s+(l.days||0),0) }}</div>
+          <div class="s-label">出差总天数</div>
+        </div>
+        <div class="stat-item" style="cursor:pointer" @click="activeTab='records'">
           <div class="s-val" style="color:var(--danger)" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalUnreimbursed) }}</div>
           <div class="s-label">待报销金额</div>
         </div>
         <div class="stat-item">
-          <div class="s-val" style="color:var(--success)" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalReimbursed) }}</div>
-          <div class="s-label">已报销金额</div>
+          <div class="s-val" style="color:var(--success)" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalReimbursed+totalUnreimbursed) }}</div>
+          <div class="s-label">报销总额</div>
         </div>
-        <div class="stat-item full">
-          <div class="s-val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalReimbursed+totalUnreimbursed) }}</div>
-          <div class="s-label">公司报销总额</div>
+      </div>
+
+      <!-- 报销状态汇总 -->
+      <div class="card">
+        <div class="panel-title">📑 报销状态</div>
+        <div class="stat-grid">
+          <div class="stat-item">
+            <div class="s-val" style="color:var(--danger)" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalUnreimbursed) }}</div>
+            <div class="s-label">待报销金额</div>
+          </div>
+          <div class="stat-item">
+            <div class="s-val" style="color:var(--success)" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalReimbursed) }}</div>
+            <div class="s-label">已报销金额</div>
+          </div>
         </div>
+      </div>
+
+      <!-- 报销柱状图 -->
+      <div class="card">
+        <div class="chart-header">
+          <div class="panel-title" style="margin:0">📈 报销趋势</div>
+          <select v-model="barGroupBy" @change="renderBarChart" style="font-size:.78rem;padding:4px 8px;width:auto">
+            <option value="all">全部</option>
+            <option value="month">按月</option>
+            <option value="quarter">按季度</option>
+          </select>
+        </div>
+        <div class="chart-wrap-sm" ref="barChartEl"></div>
       </div>
     </div>
 
-    <!-- 常用联系人 -->
-    <div class="card">
-      <div class="panel-title">📇 常用联系人</div>
-      <div v-if="contactGroups.length===0" style="padding:16px;text-align:center;color:var(--text-dim);font-size:.85rem">
-        暂无联系人（在出差记录中添加项目联系人后自动显示）
-      </div>
-      <div v-for="grp in contactGroups" :key="grp.project" class="contact-group">
-        <div class="contact-group-header" :class="{expanded:isContactGroupOpen(grp.project)}" @click="toggleContactGroup(grp.project)">
-          <span class="contact-group-name">📁 {{ grp.project || '(未关联项目)' }}</span>
-          <span style="font-size:.75rem;color:var(--text-dim)">{{ grp.contacts.length }}人</span>
+    <!-- ========== Tab2: 出差记录 ========== -->
+    <div class="tab-page" :class="{active:activeTab==='records'}">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px">
+          <h1 style="font-size:1.1rem;font-weight:700;color:#fff">📋 出差记录</h1>
+          <span class="badge badge-primary">{{ filteredLogs.length }} 条</span>
         </div>
-        <div v-show="isContactGroupOpen(grp.project)">
-          <div v-for="c in grp.contacts" :key="c.name+c.contact" class="contact-item">
-            <span>{{ c.name }}<span v-if="c.project" style="color:var(--text-dim);font-size:.75rem;margin-left:6px">{{ c.project }}</span></span>
-            <span style="color:var(--primary-light);font-size:.8rem">{{ c.contact||'-' }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 施工管理综合模块（工作日志 + 问题库 + 进度管理） -->
-    <div class="card" style="padding-bottom:0">
-      <!-- Tab切换栏 -->
-      <div class="tab-bar">
-        <div class="tab-item" :class="{active:workTab==='worklog'}" @click="workTab='worklog'">
-          📝 工作日志<span class="tab-count">{{ workLogs.length }}</span>
-        </div>
-        <div class="tab-item" :class="{active:workTab==='issues'}" @click="workTab='issues'">
-          ⚠️ 问题库<span class="tab-count">{{ issues.length }}</span>
-        </div>
-        <div class="tab-item" :class="{active:workTab==='progress'}" @click="workTab='progress'">
-          📊 施工进度<span class="tab-count">{{ progresses.length }}</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <button class="btn btn-ghost btn-sm" @click="hideAmounts=!hideAmounts" :title="hideAmounts?'显示金额':'隐藏金额'" style="font-size:.78rem;padding:4px 8px">
+            {{ hideAmounts?'🔓':'🔒' }}
+          </button>
+          <button v-if="!isReadOnly" class="btn btn-primary btn-sm" @click="openCreate">✚ 新建出差</button>
         </div>
       </div>
 
-      <!-- ===== Tab1: 工作日志 ===== -->
-      <div class="tab-content" v-show="workTab==='worklog'">
-        <div v-if="!isReadOnly" style="margin-bottom:10px;display:flex;gap:6px;flex-wrap:wrap">
-          <button class="btn btn-primary btn-sm" @click="openWorkLogForm(null)">✚ 记录今天</button>
-          <div class="export-wrap" style="position:relative">
-            <button class="btn btn-ghost btn-sm" @click="showWorkLogExport=!showWorkLogExport">📤 导出 ▾</button>
-            <div v-if="showWorkLogExport" class="export-dropdown">
-              <button @click="exportWorkLogExcel">📊 Excel</button>
-              <button @click="exportWorkLogWord">📝 Word</button>
-            </div>
-          </div>
-        </div>
-        <div class="worklog-list">
-          <div v-if="sortedWorkLogs.length===0" style="padding:20px;text-align:center;color:var(--text-dim);font-size:.85rem">
-            暂无工作日志
-          </div>
-          <div v-for="w in sortedWorkLogs" :key="w.id" class="worklog-item">
-            <div class="worklog-item-header">
-              <div class="worklog-item-date">
-                <span class="worklog-date-badge">{{ w.date }}</span>
-                <span class="worklog-type-badge">{{ w.type }}</span>
-              </div>
-              <div class="worklog-item-actions" v-if="!isReadOnly">
-                <button class="btn-icon" style="width:24px;height:24px;font-size:.7rem" @click="openWorkLogForm(w)">✏️</button>
-                <button class="btn-icon danger" style="width:24px;height:24px;font-size:.7rem" @click="deleteWorkLog(w.id)">🗑️</button>
-              </div>
-            </div>
-            <div class="worklog-item-content">{{ w.content || '(未填内容)' }}</div>
-            <div class="worklog-item-meta" v-if="w.participants || w.location">
-              <span v-if="w.participants">👥 {{ w.participants }}</span>
-              <span v-if="w.location">📍 {{ w.location }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ===== Tab2: 施工问题库 ===== -->
-      <div class="tab-content" v-show="workTab==='issues'">
-        <div v-if="!isReadOnly" style="margin-bottom:10px;display:flex;gap:6px;flex-wrap:wrap">
-          <button class="btn btn-primary btn-sm" @click="openIssueForm(null)">✚ 新建问题</button>
-          <button class="btn btn-ghost btn-sm" @click="showIssueFilter=!showIssueFilter">🔍 筛选</button>
-          <div class="export-wrap" style="position:relative">
-            <button class="btn btn-ghost btn-sm" @click="showIssueExport=!showIssueExport">📤 导出 ▾</button>
-            <div v-if="showIssueExport" class="export-dropdown">
-              <button @click="exportIssueExcel">📊 Excel</button>
-              <button @click="exportIssueWord">📝 Word</button>
-            </div>
-          </div>
-        </div>
-        <!-- 筛选 -->
-        <div v-if="showIssueFilter" class="form-row cols-2" style="margin-bottom:8px;gap:6px">
+      <!-- 搜索过滤 -->
+      <div class="card" style="padding:12px">
+        <div class="search-bar" style="grid-template-columns:1fr 1fr auto 1fr;align-items:end">
           <div class="form-group">
-            <label class="form-label">状态</label>
-            <select v-model="issueFilter.status" style="font-size:.8rem;padding:5px 8px">
-              <option value="">全部</option>
-              <option value="待处理">待处理</option><option value="处理中">处理中</option>
-              <option value="已解决">已解决</option><option value="已关闭">已关闭</option>
-            </select>
+            <label class="form-label">开始日期</label>
+            <input type="date" v-model="filter.dateFrom">
           </div>
           <div class="form-group">
-            <label class="form-label">优先级</label>
-            <select v-model="issueFilter.priority" style="font-size:.8rem;padding:5px 8px">
-              <option value="">全部</option>
-              <option value="高">高</option><option value="中">中</option><option value="低">低</option>
-            </select>
+            <label class="form-label">结束日期</label>
+            <input type="date" v-model="filter.dateTo">
+          </div>
+          <div style="display:flex;align-items:flex-end;padding-bottom:1px">
+            <button class="btn btn-ghost btn-sm" @click="resetFilter">重置</button>
+          </div>
+          <div class="form-group">
+            <label class="form-label">关键词搜索</label>
+            <input type="text" v-model="filter.keyword" placeholder="酒店/项目/内容/联系人…">
           </div>
         </div>
-        <!-- 问题列表 -->
-        <div style="max-height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-bottom:16px">
-          <div v-if="filteredIssues.length===0" style="padding:20px;text-align:center;color:var(--text-dim);font-size:.85rem">
-            暂无施工问题
-          </div>
-          <div v-for="iss in filteredIssues" :key="iss.id" class="worklog-item" style="border-left:3px solid" :style="{borderLeftColor: iss.priority==='高'?'var(--danger)':iss.priority==='中'?'var(--warning)':'var(--success)'}">
-            <div class="worklog-item-header">
-              <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
-                <span class="badge" :class="{
-                  'badge-danger':iss.status==='待处理',
-                  'badge-gold':iss.status==='处理中',
-                  'badge-success':iss.status==='已解决',
-                  'badge-info':iss.status==='已关闭'
-                }">{{ iss.status }}</span>
-                <span style="font-size:.82rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" :title="iss.title">{{ iss.title }}</span>
-              </div>
-              <div class="worklog-item-actions" v-if="!isReadOnly">
-                <button class="btn-icon" style="width:24px;height:24px;font-size:.7rem" @click="openIssueForm(iss)">✏️</button>
-                <button class="btn-icon danger" style="width:24px;height:24px;font-size:.7rem" @click="deleteIssue(iss.id)">🗑️</button>
-              </div>
-            </div>
-            <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:4px">{{ iss.description||'' }}</div>
-            <div class="worklog-item-meta">
-              <span v-if="iss.priority">🔥 优先级: {{ iss.priority }}</span>
-              <span v-if="iss.project">📁 {{ iss.project }}</span>
-              <span v-if="iss.reportDate">📅 {{ iss.reportDate }}</span>
-              <span v-if="iss.resolveDate">✅ {{ iss.resolveDate }}</span>
-            </div>
-          </div>
+        <div class="filter-tags" v-if="projectTags.length">
+          <span class="tag-btn" :class="{active:!filter.project}" @click="filter.project=''">全部</span>
+          <span v-for="tag in projectTags" :key="tag"
+            class="tag-btn" :class="{active:filter.project===tag}"
+            @click="filter.project=(filter.project===tag?'':tag)">{{ tag }}</span>
         </div>
       </div>
 
-      <!-- ===== Tab3: 施工进度管理 ===== -->
-      <div class="tab-content" v-show="workTab==='progress'">
-        <div v-if="!isReadOnly" style="margin-bottom:10px;display:flex;gap:6px;flex-wrap:wrap">
-          <button class="btn btn-primary btn-sm" @click="openProgressForm(null)">✚ 新建任务</button>
-          <div class="export-wrap" style="position:relative">
-            <button class="btn btn-ghost btn-sm" @click="showProgressExport=!showProgressExport">📤 导出 ▾</button>
-            <div v-if="showProgressExport" class="export-dropdown">
-              <button @click="exportProgressExcel">📊 Excel</button>
-              <button @click="exportProgressWord">📝 Word</button>
+      <!-- 日志列表 -->
+      <div class="log-list">
+        <div v-if="filteredLogs.length===0" class="empty-state glass">
+          <div class="empty-icon">📋</div>
+          <div>暂无出差记录</div>
+          <button v-if="!isReadOnly" class="btn btn-primary btn-sm" @click="openCreate">新建出差</button>
+        </div>
+        <transition-group name="list">
+          <div v-for="log in filteredLogs" :key="log.id"
+            class="log-card" :class="{['reimbursed-card']:log.reimbursed}">
+            <div class="log-card-top">
+              <div>
+                <div class="log-card-title">{{ log.hotelName || '(未填酒店)' }}</div>
+                <div class="log-card-sub">
+                  {{ log.projectName || '(未填项目)' }} &nbsp;|&nbsp;
+                  {{ log.startDate }} ~ {{ log.endDate }} &nbsp;({{ log.days }}天)
+                </div>
+              </div>
+              <div class="log-card-actions" v-if="!isReadOnly">
+                <button class="btn-icon" title="编辑" @click="openEdit(log)">✏️</button>
+                <button class="btn-icon danger" title="删除" @click="deleteLog(log.id)">🗑️</button>
+              </div>
+            </div>
+            <div class="log-card-amounts">
+              <div class="amount-item"><span class="label">补贴</span><span class="val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+(log.subsidyTotal||0) }}</span></div>
+              <div class="amount-item"><span class="label">交通</span><span class="val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+(log.totalTransport||0) }}</span></div>
+              <div class="amount-item"><span class="label">用餐</span><span class="val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+(log.totalMeal||0) }}</span></div>
+              <div class="amount-item" v-if="(log.totalEntertain||0)>0"><span class="label">招待</span><span class="val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+log.totalEntertain }}</span></div>
+              <div class="amount-item" v-if="(log.totalAdvance||0)>0"><span class="label">垫资</span><span class="val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+log.totalAdvance }}</span></div>
+            </div>
+            <div class="log-card-footer">
+              <div>
+                <div class="reimburse-total">
+                  <small>公司报销</small>{{ hideAmounts?'¥****':'¥'+fmt(log.reimbursementTotal||0) }}
+                </div>
+                <div class="personal-cost" v-if="(log.personalTotal||0)>0">
+                  个人支出 {{ hideAmounts?'¥****':'¥'+fmt(log.personalTotal) }}
+                </div>
+              </div>
+              <label class="reimburse-check">
+                <input type="checkbox" :checked="log.reimbursed" @change="toggleReimbursed(log)">
+                已报销
+              </label>
+            </div>
+          </div>
+        </transition-group>
+      </div>
+    </div>
+
+    <!-- ========== Tab3: 项目施工 ========== -->
+    <div class="tab-page" :class="{active:activeTab==='project'}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <h1 style="font-size:1.1rem;font-weight:700;color:#fff">🔧 项目施工</h1>
+      </div>
+
+      <!-- 施工管理综合模块（工作日志 + 问题库 + 进度管理） -->
+      <div class="card" style="padding-bottom:0">
+        <!-- Tab切换栏 -->
+        <div class="tab-bar">
+          <div class="tab-item" :class="{active:workTab==='worklog'}" @click="workTab='worklog'">
+            📝 工作日志<span class="tab-count">{{ workLogs.length }}</span>
+          </div>
+          <div class="tab-item" :class="{active:workTab==='issues'}" @click="workTab='issues'">
+            ⚠️ 问题库<span class="tab-count">{{ issues.length }}</span>
+          </div>
+          <div class="tab-item" :class="{active:workTab==='progress'}" @click="workTab='progress'">
+            📊 施工进度<span class="tab-count">{{ progresses.length }}</span>
+          </div>
+        </div>
+
+        <!-- Tab1: 工作日志 -->
+        <div class="tab-content" v-show="workTab==='worklog'">
+          <div v-if="!isReadOnly" style="margin-bottom:10px">
+            <button class="btn btn-primary btn-sm" @click="openWorkLogForm(null)">✚ 记录今天</button>
+          </div>
+          <div class="worklog-list">
+            <div v-if="sortedWorkLogs.length===0" style="padding:20px;text-align:center;color:var(--text-dim);font-size:.85rem">暂无工作日志</div>
+            <div v-for="w in sortedWorkLogs" :key="w.id" class="worklog-item">
+              <div class="worklog-item-header">
+                <div class="worklog-item-date">
+                  <span class="worklog-date-badge">{{ w.date }}</span>
+                  <span class="worklog-type-badge">{{ w.type }}</span>
+                </div>
+                <div class="worklog-item-actions" v-if="!isReadOnly">
+                  <button class="btn-icon" style="width:24px;height:24px;font-size:.7rem" @click="openWorkLogForm(w)">✏️</button>
+                  <button class="btn-icon danger" style="width:24px;height:24px;font-size:.7rem" @click="deleteWorkLog(w.id)">🗑️</button>
+                </div>
+              </div>
+              <div class="worklog-item-content">{{ w.content || '(未填内容)' }}</div>
+              <div class="worklog-item-meta" v-if="w.participants || w.location">
+                <span v-if="w.participants">👥 {{ w.participants }}</span>
+                <span v-if="w.location">📍 {{ w.location }}</span>
+              </div>
             </div>
           </div>
         </div>
-        <div style="max-height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-bottom:16px">
-          <div v-if="sortedProgress.length===0" style="padding:20px;text-align:center;color:var(--text-dim);font-size:.85rem">
-            暂无进度记录
+
+        <!-- Tab2: 施工问题库 -->
+        <div class="tab-content" v-show="workTab==='issues'">
+          <div v-if="!isReadOnly" style="margin-bottom:10px;display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-primary btn-sm" @click="openIssueForm(null)">✚ 新建问题</button>
+            <button class="btn btn-ghost btn-sm" @click="showIssueFilter=!showIssueFilter">🔍 筛选</button>
           </div>
-          <div v-for="pg in sortedProgress" :key="pg.id" class="worklog-item">
-            <div class="worklog-item-header">
-              <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
-                <span style="font-size:.85rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" :title="pg.taskName">{{ pg.taskName }}</span>
-                <span class="badge" :class="{
-                  'badge-danger':pg.progress<30,
-                  'badge-gold':pg.progress>=30&&pg.progress<70,
-                  'badge-success':pg.progress>=70&&pg.progress<100,
-                  'badge-info':pg.progress>=100
-                }">{{ pg.progress>=100?'已完成':pg.progress+'%' }}</span>
+          <div v-if="showIssueFilter" class="form-row cols-2" style="margin-bottom:8px;gap:6px">
+            <div class="form-group">
+              <label class="form-label">状态</label>
+              <select v-model="issueFilter.status" style="font-size:.8rem;padding:5px 8px">
+                <option value="">全部</option>
+                <option value="待处理">待处理</option><option value="处理中">处理中</option>
+                <option value="已解决">已解决</option><option value="已关闭">已关闭</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">优先级</label>
+              <select v-model="issueFilter.priority" style="font-size:.8rem;padding:5px 8px">
+                <option value="">全部</option>
+                <option value="高">高</option><option value="中">中</option><option value="低">低</option>
+              </select>
+            </div>
+          </div>
+          <div style="max-height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-bottom:16px">
+            <div v-if="filteredIssues.length===0" style="padding:20px;text-align:center;color:var(--text-dim);font-size:.85rem">暂无施工问题</div>
+            <div v-for="iss in filteredIssues" :key="iss.id" class="worklog-item" style="border-left:3px solid" :style="{borderLeftColor: iss.priority==='高'?'var(--danger)':iss.priority==='中'?'var(--warning)':'var(--success)'}">
+              <div class="worklog-item-header">
+                <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
+                  <span class="badge" :class="{'badge-danger':iss.status==='待处理','badge-gold':iss.status==='处理中','badge-success':iss.status==='已解决','badge-info':iss.status==='已关闭'}">{{ iss.status }}</span>
+                  <span style="font-size:.82rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" :title="iss.title">{{ iss.title }}</span>
+                </div>
+                <div class="worklog-item-actions" v-if="!isReadOnly">
+                  <button class="btn-icon" style="width:24px;height:24px;font-size:.7rem" @click="openIssueForm(iss)">✏️</button>
+                  <button class="btn-icon danger" style="width:24px;height:24px;font-size:.7rem" @click="deleteIssue(iss.id)">🗑️</button>
+                </div>
               </div>
-              <div class="worklog-item-actions" v-if="!isReadOnly">
-                <button class="btn-icon" style="width:24px;height:24px;font-size:.7rem" @click="openProgressForm(pg)">✏️</button>
-                <button class="btn-icon danger" style="width:24px;height:24px;font-size:.7rem" @click="deleteProgress(pg.id)">🗑️</button>
+              <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:4px">{{ iss.description||'' }}</div>
+              <div class="worklog-item-meta">
+                <span v-if="iss.priority">🔥 优先级: {{ iss.priority }}</span>
+                <span v-if="iss.project">📁 {{ iss.project }}</span>
+                <span v-if="iss.reportDate">📅 {{ iss.reportDate }}</span>
+                <span v-if="iss.resolveDate">✅ {{ iss.resolveDate }}</span>
               </div>
             </div>
-            <div style="margin:6px 0;background:#ffffff10;border-radius:10px;height:8px;overflow:hidden">
-              <div :style="{width:Math.min(pg.progress,100)+'%',background:pg.progress>=100?'var(--success)':pg.progress>=70?'#22c55ecc':pg.progress>=30?'var(--warning)':'var(--danger)',transition:'width .3s',height:'100%',borderRadius:'10px'}"></div>
+          </div>
+        </div>
+
+        <!-- Tab3: 施工进度管理 -->
+        <div class="tab-content" v-show="workTab==='progress'">
+          <div v-if="!isReadOnly" style="margin-bottom:10px">
+            <button class="btn btn-primary btn-sm" @click="openProgressForm(null)">✚ 新建任务</button>
+          </div>
+          <div style="max-height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-bottom:16px">
+            <div v-if="sortedProgress.length===0" style="padding:20px;text-align:center;color:var(--text-dim);font-size:.85rem">暂无进度记录</div>
+            <div v-for="pg in sortedProgress" :key="pg.id" class="worklog-item">
+              <div class="worklog-item-header">
+                <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
+                  <span style="font-size:.85rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" :title="pg.taskName">{{ pg.taskName }}</span>
+                  <span class="badge" :class="{'badge-danger':pg.progress<30,'badge-gold':pg.progress>=30&&pg.progress<70,'badge-success':pg.progress>=70&&pg.progress<100,'badge-info':pg.progress>=100}">{{ pg.progress>=100?'已完成':pg.progress+'%' }}</span>
+                </div>
+                <div class="worklog-item-actions" v-if="!isReadOnly">
+                  <button class="btn-icon" style="width:24px;height:24px;font-size:.7rem" @click="openProgressForm(pg)">✏️</button>
+                  <button class="btn-icon danger" style="width:24px;height:24px;font-size:.7rem" @click="deleteProgress(pg.id)">🗑️</button>
+                </div>
+              </div>
+              <div style="margin:6px 0;background:#ffffff10;border-radius:10px;height:8px;overflow:hidden">
+                <div :style="{width:Math.min(pg.progress,100)+'%',background:pg.progress>=100?'var(--success)':pg.progress>=70?'#22c55ecc':pg.progress>=30?'var(--warning)':'var(--danger)',transition:'width .3s',height:'100%',borderRadius:'10px'}"></div>
+              </div>
+              <div class="worklog-item-meta">
+                <span v-if="pg.project">📁 {{ pg.project }}</span>
+                <span v-if="pg.plannedStart">📅 计划: {{ pg.plannedStart }} ~ {{ pg.plannedEnd }}</span>
+                <span v-if="pg.actualEnd">✅ 实际完成: {{ pg.actualEnd }}</span>
+                <span v-if="pg.responsible">👤 {{ pg.responsible }}</span>
+              </div>
+              <div v-if="pg.remark" style="font-size:.76rem;color:var(--text-dim);margin-top:4px">💬 {{ pg.remark }}</div>
             </div>
-            <div class="worklog-item-meta">
-              <span v-if="pg.project">📁 {{ pg.project }}</span>
-              <span v-if="pg.plannedStart">📅 计划: {{ pg.plannedStart }} ~ {{ pg.plannedEnd }}</span>
-              <span v-if="pg.actualEnd">✅ 实际完成: {{ pg.actualEnd }}</span>
-              <span v-if="pg.responsible">👤 {{ pg.responsible }}</span>
-            </div>
-            <div v-if="pg.remark" style="font-size:.76rem;color:var(--text-dim);margin-top:4px">💬 {{ pg.remark }}</div>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- ========== Tab4: 更多 ========== -->
+    <div class="tab-page" :class="{active:activeTab==='more'}">
+      <h1 style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:4px">⚙️ 更多</h1>
+
+      <!-- 脱敏控制 -->
+      <div class="card" style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:.88rem;font-weight:600;color:#fff">🔒 金额脱敏</div>
+          <div style="font-size:.75rem;color:var(--text-muted);margin-top:2px">开启后所有金额显示为 ¥****（需密码）</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:.78rem" :style="{color:hideAmounts?'var(--warning)':'var(--text-dim)'}">{{ hideAmounts?'🔒 已开启':'已关闭' }}</span>
+          <button class="btn btn-sm" :class="hideAmounts?'btn-ghost':'btn-primary'" @click="toggleMaskWithPin">
+            {{ hideAmounts?'🔓 关闭':'🔒 开启' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- 脱敏密码弹窗 -->
+      <transition name="fade">
+      <div v-if="showPinModal" class="modal-overlay" @click.self="showPinModal=false">
+        <div class="modal" style="max-width:360px">
+          <div class="modal-header">
+            <span class="modal-title">{{ pinAction==='set'?'🔐 设置脱敏密码':pinAction==='verify'?'🔐 输入脱敏密码':'🔐 设置新密码' }}</span>
+            <button class="modal-close" @click="showPinModal=false">✕</button>
+          </div>
+          <div class="modal-body" style="text-align:center;padding:20px 16px">
+            <div v-if="pinAction==='set'||pinAction==='reset'" style="margin-bottom:16px">
+              <div style="font-size:.82rem;color:var(--text-muted);margin-bottom:10px">请输入4位数字密码</div>
+              <div style="display:flex;gap:10px;justify-content:center">
+                <input v-for="i in 4" :key="i" type="tel" maxlength="1" :ref="el=>{if(el) pinInputs[i-1]=el}"
+                  :value="pinDigits[i-1]||''"
+                  @input="onPinInput($event,i-1)"
+                  @keydown.backspace="onPinBackspace($event,i-1)"
+                  style="width:48px;height:56px;text-align:center;font-size:1.4rem;font-weight:700;
+                    background:#ffffff0d;border:2px solid var(--glass-border);border-radius:10px;
+                    color:var(--text);outline:none;caret-color:var(--primary-light)"
+                  :style="{borderColor: pinDigits[i-1]?'var(--primary-light)':'var(--glass-border)'}">
+              </div>
+            </div>
+            <div v-else style="margin-bottom:16px">
+              <div style="font-size:.82rem;color:var(--text-muted);margin-bottom:10px">请输入4位数字密码以{{ hideAmounts?'关闭':'开启' }}脱敏</div>
+              <div style="display:flex;gap:10px;justify-content:center">
+                <input v-for="i in 4" :key="i" type="tel" maxlength="1" :ref="el=>{if(el) pinInputs[i-1]=el}"
+                  :value="pinDigits[i-1]||''"
+                  @input="onPinInput($event,i-1)"
+                  @keydown.backspace="onPinBackspace($event,i-1)"
+                  style="width:48px;height:56px;text-align:center;font-size:1.4rem;font-weight:700;
+                    background:#ffffff0d;border:2px solid var(--glass-border);border-radius:10px;
+                    color:var(--text);outline:none;caret-color:var(--primary-light)"
+                  :style="{borderColor: pinError?'var(--danger)':pinDigits[i-1]?'var(--primary-light)':'var(--glass-border)'}">
+              </div>
+              <div v-if="pinError" style="font-size:.75rem;color:var(--danger);margin-top:8px">密码错误，请重试</div>
+            </div>
+            <button class="btn btn-primary" style="width:100%" @click="confirmPin" :disabled="pinDigits.join('').length<4">
+              {{ pinAction==='set'?'确认设置':'确认' }}
+            </button>
+          </div>
+        </div>
+      </div>
+      </transition>
+
+      <!-- 个人支出概览 -->
+      <div class="card">
+        <div class="panel-title" style="margin-bottom:10px">📒 个人支出概览</div>
+        <div class="expense-summary-list">
+          <div class="expense-row">
+            <div class="expense-row-icon">🏨</div>
+            <div class="expense-row-body">
+              <div class="expense-row-label">住宿费</div>
+              <div class="expense-row-bar">
+                <div class="expense-row-fill" :style="{width: totalPersonalHotel+totalPersonalMeal+totalOtherExpense ? (totalPersonalHotel/(totalPersonalHotel+totalPersonalMeal+totalOtherExpense)*100)+'%' : '0%', background:'#6c5ce7'}"></div>
+              </div>
+            </div>
+            <div class="expense-row-val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalPersonalHotel) }}</div>
+          </div>
+          <div class="expense-row">
+            <div class="expense-row-icon">🍽️</div>
+            <div class="expense-row-body">
+              <div class="expense-row-label">餐饮费</div>
+              <div class="expense-row-bar">
+                <div class="expense-row-fill" :style="{width: totalPersonalHotel+totalPersonalMeal+totalOtherExpense ? (totalPersonalMeal/(totalPersonalHotel+totalPersonalMeal+totalOtherExpense)*100)+'%' : '0%', background:'#00b894'}"></div>
+              </div>
+            </div>
+            <div class="expense-row-val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalPersonalMeal) }}</div>
+          </div>
+          <div class="expense-row">
+            <div class="expense-row-icon">💰</div>
+            <div class="expense-row-body">
+              <div class="expense-row-label">其他消费</div>
+              <div class="expense-row-bar">
+                <div class="expense-row-fill" :style="{width: totalPersonalHotel+totalPersonalMeal+totalOtherExpense ? (totalOtherExpense/(totalPersonalHotel+totalPersonalMeal+totalOtherExpense)*100)+'%' : '0%', background:'#fdcb6e'}"></div>
+              </div>
+            </div>
+            <div class="expense-row-val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalOtherExpense) }}</div>
+          </div>
+        </div>
+        <div class="expense-total-row">
+          <span class="expense-total-label">个人支出合计</span>
+          <span class="expense-total-val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(totalPersonalHotel+totalPersonalMeal+totalOtherExpense) }}</span>
+        </div>
+      </div>
+
+      <!-- 发票管理 -->
+      <div class="card">
+        <div class="panel-title" style="margin-bottom:10px">🧾 发票管理</div>
+
+        <!-- 统计卡片 -->
+        <div class="inv-stats">
+          <div class="inv-stat">
+            <div class="inv-stat-val">{{ invoices.length }}</div>
+            <div class="inv-stat-label">总发票</div>
+          </div>
+          <div class="inv-stat">
+            <div class="inv-stat-val" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(invTotalAmount) }}</div>
+            <div class="inv-stat-label">总金额</div>
+          </div>
+          <div class="inv-stat">
+            <div class="inv-stat-val" style="color:var(--success)">{{ invoices.filter(i=>i.status==='approved').length }}</div>
+            <div class="inv-stat-label">已确认</div>
+          </div>
+        </div>
+
+        <!-- 分类筛选 -->
+        <div class="inv-cats">
+          <div class="inv-cat-chip" :class="{active:invFilterType===''}" @click="invFilterType=''">全部</div>
+          <div class="inv-cat-chip" :class="{active:invFilterType==='transport'}" @click="invFilterType='transport'">🚄交通</div>
+          <div class="inv-cat-chip" :class="{active:invFilterType==='hotel'}" @click="invFilterType='hotel'">🏨住宿</div>
+          <div class="inv-cat-chip" :class="{active:invFilterType==='meal'}" @click="invFilterType='meal'">🍽️餐饮</div>
+          <div class="inv-cat-chip" :class="{active:invFilterType==='material'}" @click="invFilterType='material'">📦物资采购</div>
+        </div>
+
+        <!-- 工具栏 -->
+        <div class="inv-toolbar">
+          <input class="inv-search" v-model="invSearch" placeholder="🔍 搜索发票号/开票方/项目…">
+          <button class="btn btn-primary btn-sm" @click="openInvoiceForm()" v-if="!isReadOnly">+ 添加</button>
+        </div>
+
+        <!-- 发票列表 -->
+        <div class="inv-list" v-if="filteredInvoices.length>0">
+          <div class="inv-item" v-for="inv in filteredInvoices" :key="inv.id" @click="openInvoiceForm(inv)">
+            <img v-if="inv.thumbnail" :src="inv.thumbnail" class="inv-img-thumb" @click.stop="showInvImage(inv)">
+            <div class="inv-item-icon" v-else>{{ invTypeIcon(inv.type) }}</div>
+            <div class="inv-item-body">
+              <div class="inv-item-title">{{ inv.sellerName || inv.invoiceNo || '未填写' }}</div>
+              <div class="inv-item-meta">
+                <span v-if="inv.invoiceNo">{{ inv.invoiceNo }}</span>
+                <span v-if="inv.invoiceDate">{{ inv.invoiceDate }}</span>
+                <span v-if="inv.project" class="inv-project-tag">{{ inv.project }}</span>
+              </div>
+            </div>
+            <div class="inv-item-right">
+              <div class="inv-item-amount" :class="{'amount-masked':hideAmounts}">{{ hideAmounts?'¥****':'¥'+fmt(inv.amount) }}</div>
+              <span class="inv-status" :class="inv.status">{{ invStatusLabel(inv.status) }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="inv-empty" v-else>
+          <div class="inv-empty-icon">🧾</div>
+          暂无发票记录<br>
+          <span style="font-size:.72rem;opacity:.7">点击「+ 添加」上传发票图片或手动录入</span>
+        </div>
+      </div>
+
+      <!-- 发票图片预览 -->
+      <div v-if="invPreviewImg" class="inv-img-preview" @click="invPreviewImg=''">
+        <button class="inv-img-preview-close" @click.stop="invPreviewImg=''">✕</button>
+        <img :src="invPreviewImg">
+      </div>
+
+      <!-- 常用通讯录 -->
+      <div class="card">
+        <div class="panel-title">📇 常用通讯录</div>
+        <div v-if="contactGroups.length===0" style="padding:20px 16px;text-align:center;color:var(--text-dim);font-size:.82rem">
+          <div style="font-size:1.6rem;margin-bottom:6px;opacity:.4">📇</div>
+          暂无联系人<br>
+          <span style="font-size:.72rem;opacity:.7">在出差记录中添加项目联系人后自动显示</span>
+        </div>
+        <div v-for="grp in contactGroups" :key="grp.project" class="contact-group">
+          <div class="contact-group-header" :class="{expanded:isContactGroupOpen(grp.project)}" @click="toggleContactGroup(grp.project)">
+            <span class="contact-group-name">📁 {{ grp.project || '(未关联项目)' }}</span>
+            <span style="font-size:.75rem;color:var(--text-dim)">{{ grp.contacts.length }}人</span>
+          </div>
+          <div v-show="isContactGroupOpen(grp.project)">
+            <div v-for="c in grp.contacts" :key="c.name+c.contact" class="contact-item">
+              <div>
+                <span style="font-weight:500">{{ c.name }}</span>
+                <span v-if="c.project" style="color:var(--text-dim);font-size:.75rem;margin-left:6px">{{ c.project }}</span>
+              </div>
+              <span style="color:var(--primary-light);font-size:.8rem">{{ c.contact||'-' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page-content -->
+</div><!-- /main-layout -->
+
+<!-- ===== 发票编辑模态框 ===== -->
+<transition name="fade">
+<div v-if="showInvoiceModal" class="modal-overlay" @click.self="showInvoiceModal=false">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <span class="modal-title">{{ editingInvoiceId?'编辑发票':'添加发票' }}</span>
+      <button class="modal-close" @click="showInvoiceModal=false">✕</button>
+    </div>
+    <div class="modal-body" style="max-height:70vh;overflow-y:auto">
+
+      <!-- 发票类型选择 -->
+      <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:6px;font-weight:500">发票类型</div>
+      <div class="inv-type-select">
+        <div class="inv-type-opt" :class="{active:invoiceForm.type==='transport'}" @click="invoiceForm.type='transport'">🚄交通</div>
+        <div class="inv-type-opt" :class="{active:invoiceForm.type==='hotel'}" @click="invoiceForm.type='hotel'">🏨住宿</div>
+        <div class="inv-type-opt" :class="{active:invoiceForm.type==='meal'}" @click="invoiceForm.type='meal'">🍽️餐饮</div>
+        <div class="inv-type-opt" :class="{active:invoiceForm.type==='material'}" @click="invoiceForm.type='material'">📦物资采购</div>
+      </div>
+
+      <!-- 图片上传区 -->
+      <div class="inv-upload-area" :class="{'has-img':invoiceForm.image}" @click="triggerInvUpload">
+        <template v-if="!invoiceForm.image">
+          <div style="font-size:1.6rem;margin-bottom:4px;opacity:.5">📷</div>
+          <div style="font-size:.78rem;color:var(--text-muted)">点击上传发票照片</div>
+          <div style="font-size:.68rem;color:var(--text-dim);margin-top:2px">支持 JPG/PNG，建议 < 2MB</div>
+        </template>
+        <template v-else>
+          <img :src="invoiceForm.image">
+        </template>
+      </div>
+      <input type="file" ref="invFileInput" accept="image/*" style="display:none" @change="onInvFileSelected">
+
+      <!-- OCR状态 -->
+      <div class="inv-ocr-status" :class="[invoiceForm._ocrStatus, invoiceForm._ocrStatus?'has-status':'']">
+        <template v-if="invoiceForm._ocrStatus==='loading'">⏳ OCR 识别中…</template>
+        <template v-else-if="invoiceForm._ocrStatus==='done'">✅ OCR 识别完成，请核对以下信息</template>
+        <template v-else-if="invoiceForm._ocrStatus==='fail'">❌ OCR 识别失败，请手动录入</template>
+      </div>
+
+      <!-- 发票字段 -->
+      <div class="inv-form-row">
+        <div class="inv-form-group">
+          <span class="inv-form-label">发票号码</span>
+          <input v-model="invoiceForm.invoiceNo" placeholder="如：044001800111">
+        </div>
+        <div class="inv-form-group">
+          <span class="inv-form-label">开票日期</span>
+          <input type="date" v-model="invoiceForm.invoiceDate">
+        </div>
+      </div>
+      <div class="inv-form-row">
+        <div class="inv-form-group">
+          <span class="inv-form-label">开票方名称</span>
+          <input v-model="invoiceForm.sellerName" placeholder="公司/商户名称">
+        </div>
+        <div class="inv-form-group">
+          <span class="inv-form-label">税号</span>
+          <input v-model="invoiceForm.taxNo" placeholder="统一社会信用代码">
+        </div>
+      </div>
+      <div class="inv-form-row">
+        <div class="inv-form-group">
+          <span class="inv-form-label">金额（不含税）</span>
+          <input type="number" step="0.01" v-model.number="invoiceForm.preTaxAmount" placeholder="0.00">
+        </div>
+        <div class="inv-form-group">
+          <span class="inv-form-label">税额</span>
+          <input type="number" step="0.01" v-model.number="invoiceForm.taxAmount" placeholder="0.00">
+        </div>
+      </div>
+      <div class="inv-form-row">
+        <div class="inv-form-group">
+          <span class="inv-form-label">价税合计（元）</span>
+          <input type="number" step="0.01" v-model.number="invoiceForm.amount" placeholder="0.00" style="font-weight:700;color:var(--gold)">
+        </div>
+        <div class="inv-form-group">
+          <span class="inv-form-label">关联项目</span>
+          <select v-model="invoiceForm.project">
+            <option value="">— 不关联 —</option>
+            <option v-for="p in projectTags" :key="p" :value="p">{{ p }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="inv-form-group" style="margin-bottom:10px">
+        <span class="inv-form-label">备注</span>
+        <textarea v-model="invoiceForm.remark" rows="2" placeholder="选填，如出差事由等"></textarea>
+      </div>
+
+      <!-- 财务确认区（仅编辑已有发票时显示） -->
+      <div v-if="editingInvoiceId" class="inv-confirm-bar">
+        <div style="flex:1">
+          <div style="font-size:.78rem;font-weight:600;color:#fff;margin-bottom:4px">财务确认</div>
+          <div style="font-size:.72rem;color:var(--text-muted)">
+            当前状态：<span :style="{color: invoiceForm.status==='approved'?'var(--success)':invoiceForm.status==='rejected'?'var(--danger)':'var(--warning)'}">{{ invStatusLabel(invoiceForm.status) }}</span>
+          </div>
+        </div>
+        <button v-if="invoiceForm.status!=='approved'" class="btn btn-sm" style="background:#22c55e30;color:var(--success);border:1px solid #22c55e50" @click="invoiceForm.status='approved'">✅ 通过</button>
+        <button v-if="invoiceForm.status!=='rejected'" class="btn btn-sm" style="background:#ef444430;color:var(--danger);border:1px solid #ef444450" @click="invoiceForm.status='rejected'">❌ 退回</button>
+        <button v-if="invoiceForm.status!=='pending'" class="btn btn-sm btn-ghost" @click="invoiceForm.status='pending'">↩️ 重置</button>
+      </div>
+      <div v-if="editingInvoiceId && invoiceForm.status==='rejected'" class="inv-reject-reason">
+        <input v-model="invoiceForm.rejectReason" placeholder="退回原因（选填）">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" @click="showInvoiceModal=false">取消</button>
+      <button class="btn btn-primary" @click="saveInvoice">💾 保存</button>
+    </div>
   </div>
 </div>
+</transition>
 
 <!-- ===== 新建/编辑 模态框 ===== -->
 <transition name="fade">
@@ -1348,7 +1792,7 @@ textarea{resize:vertical;min-height:60px}
 </transition>
 
 <!-- 移动端悬浮新建按钮 -->
-<button v-if="!isReadOnly && !showModal" class="fab-create" @click="openCreate">✚</button>
+<button v-if="!isReadOnly && !showModal" class="fab-create" @click="activeTab='records';openCreate()">✚</button>
 
 <!-- ===== 工作日志编辑模态框 ===== -->
 <transition name="fade">
@@ -1552,21 +1996,24 @@ async function fetchCloud() {
   const r = await fetch(BIN_URL+'/latest', { headers:{'X-Master-Key':API_KEY} });
   if(!r.ok) throw new Error('HTTP '+r.status);
   const d = await r.json();
-  const result = { logs: [], workLogs: [], issues: [], progresses: [] };
+  const result = { logs: [], workLogs: [], issues: [], progresses: [], invoices: [] };
   if(d.record) {
     if(d.record.logs) result.logs = d.record.logs;
     if(d.record.workLogs) result.workLogs = d.record.workLogs;
     if(d.record.issues) result.issues = d.record.issues;
     if(d.record.progresses) result.progresses = d.record.progresses;
+    if(d.record.invoices) result.invoices = d.record.invoices;
   }
   return result;
 }
 
-async function pushCloud(logs, workLogs, issues, progresses) {
+async function pushCloud(logs, workLogs, issues, progresses, invoices) {
+  const payload = {logs, workLogs, issues, progresses};
+  if(invoices) payload.invoices = invoices;
   const r = await fetch(BIN_URL, {
     method:'PUT',
     headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},
-    body:JSON.stringify({logs, workLogs, issues, progresses})
+    body:JSON.stringify(payload)
   });
   if(!r.ok) throw new Error('HTTP '+r.status);
   return true;
@@ -1605,12 +2052,33 @@ const app = createApp({
     const showIssueExport = ref(false);
     const showProgressExport = ref(false);
     const workTab = ref('worklog');
+    const activeTab = ref('home');
     const hideAmounts = ref(false);
+    const showPinModal = ref(false);
+    const pinAction = ref('set'); // set | verify | reset
+    const pinDigits = reactive(['','','','']);
+    const pinError = ref(false);
+    const pinInputs = reactive([null,null,null,null]);
     const syncStatus = ref('ok');
     const syncTime = ref('');
     const barGroupBy = ref('all');
     const selectedTpl = ref('');
     const templates = ref([]);
+
+    // === 发票管理数据 ===
+    const invoices = ref([]);
+    const showInvoiceModal = ref(false);
+    const editingInvoiceId = ref(null);
+    const invSearch = ref('');
+    const invFilterType = ref('');
+    const invPreviewImg = ref('');
+    const invFileInput = ref(null);
+    const invoiceForm = reactive({
+      id:'', type:'transport', invoiceNo:'', invoiceDate:'', sellerName:'', taxNo:'',
+      preTaxAmount:0, taxAmount:0, amount:0, project:'', remark:'',
+      status:'pending', rejectReason:'', image:'', thumbnail:'',
+      _ocrStatus:''
+    });
 
     // 图表引用
     const barChartEl = ref(null);
@@ -1631,10 +2099,12 @@ const app = createApp({
         workLogs.value = data.workLogs || [];
         issues.value = data.issues || [];
         progresses.value = data.progresses || [];
+        invoices.value = data.invoices || [];
         localStorage.setItem('chengtong_logs', JSON.stringify(logs.value));
         localStorage.setItem('chengtong_worklogs', JSON.stringify(workLogs.value));
         localStorage.setItem('chengtong_issues', JSON.stringify(issues.value));
         localStorage.setItem('chengtong_progresses', JSON.stringify(progresses.value));
+        localStorage.setItem('chengtong_invoices', JSON.stringify(invoices.value));
         syncStatus.value = 'ok';
         syncTime.value = dayjs().format('HH:mm');
         renderCharts();
@@ -1648,6 +2118,8 @@ const app = createApp({
         if(localIss) { try{ issues.value = JSON.parse(localIss); }catch(e4){} }
         const localProg = localStorage.getItem('chengtong_progresses');
         if(localProg) { try{ progresses.value = JSON.parse(localProg); }catch(e5){} }
+        const localInv = localStorage.getItem('chengtong_invoices');
+        if(localInv) { try{ invoices.value = JSON.parse(localInv); }catch(e6){} }
         syncStatus.value = 'err';
       }
     }
@@ -1655,11 +2127,12 @@ const app = createApp({
     async function syncToCloud() {
       syncStatus.value = 'syncing';
       try {
-        await pushCloud(logs.value, workLogs.value, issues.value, progresses.value);
+        await pushCloud(logs.value, workLogs.value, issues.value, progresses.value, invoices.value);
         localStorage.setItem('chengtong_logs', JSON.stringify(logs.value));
         localStorage.setItem('chengtong_worklogs', JSON.stringify(workLogs.value));
         localStorage.setItem('chengtong_issues', JSON.stringify(issues.value));
         localStorage.setItem('chengtong_progresses', JSON.stringify(progresses.value));
+        localStorage.setItem('chengtong_invoices', JSON.stringify(invoices.value));
         syncStatus.value = 'ok';
         syncTime.value = dayjs().format('HH:mm');
       } catch(e) {
@@ -1718,7 +2191,104 @@ const app = createApp({
       return !!contactOpenState[project];
     }
 
+    const totalContactCount = computed(()=> contactGroups.value.reduce((s,g)=>s+g.contacts.length, 0));
+
+    // === 发票管理 computed ===
+    const invTotalAmount = computed(()=> invoices.value.reduce((s,i)=>s+(i.amount||0),0));
+    const filteredInvoices = computed(()=>{
+      let arr = invoices.value;
+      if(invFilterType.value) arr = arr.filter(i=>i.type===invFilterType.value);
+      if(invSearch.value){
+        const kw = invSearch.value.toLowerCase();
+        arr = arr.filter(i=>
+          (i.invoiceNo||'').toLowerCase().includes(kw)||
+          (i.sellerName||'').toLowerCase().includes(kw)||
+          (i.project||'').toLowerCase().includes(kw)||
+          (i.remark||'').toLowerCase().includes(kw)
+        );
+      }
+      return arr.sort((a,b)=>(b.invoiceDate||'').localeCompare(a.invoiceDate||''));
+    });
+
     function resetFilter(){ Object.assign(filter,{dateFrom:'',dateTo:'',keyword:'',project:''}); }
+
+    // === 脱敏密码 ===
+    function getStoredPin() { return localStorage.getItem('chengtong_mask_pin') || ''; }
+    function toggleMaskWithPin() {
+      const stored = getStoredPin();
+      if(!stored) {
+        // 首次设置密码
+        pinAction.value = 'set';
+        pinDigits.splice(0,4,'','','','');
+        pinError.value = false;
+        showPinModal.value = true;
+        nextTick(()=>{
+          pinInputs[0] && pinInputs[0].focus();
+        });
+        return;
+      }
+      if(hideAmounts.value) {
+        // 当前已开启，要关闭 → 需要验证密码
+        pinAction.value = 'verify';
+        pinDigits.splice(0,4,'','','','');
+        pinError.value = false;
+        showPinModal.value = true;
+        nextTick(()=>{
+          pinInputs[0] && pinInputs[0].focus();
+        });
+      } else {
+        // 要开启 → 需要验证密码
+        pinAction.value = 'verify';
+        pinDigits.splice(0,4,'','','','');
+        pinError.value = false;
+        showPinModal.value = true;
+        nextTick(()=>{
+          pinInputs[0] && pinInputs[0].focus();
+        });
+      }
+    }
+    function onPinInput(e, idx) {
+      const val = e.target.value.replace(/\D/g,'').slice(0,1);
+      pinDigits[idx] = val;
+      e.target.value = val;
+      if(val && idx < 3) {
+        nextTick(()=>{ pinInputs[idx+1] && pinInputs[idx+1].focus(); });
+      }
+      // 4位输满自动确认
+      if(val && idx === 3) {
+        nextTick(()=>{ confirmPin(); });
+      }
+    }
+    function onPinBackspace(e, idx) {
+      if(!pinDigits[idx] && idx > 0) {
+        nextTick(()=>{
+          pinInputs[idx-1] && pinInputs[idx-1].focus();
+          pinInputs[idx-1].value = '';
+          pinDigits[idx-1] = '';
+        });
+      } else {
+        pinDigits[idx] = '';
+      }
+      pinError.value = false;
+    }
+    function confirmPin() {
+      const entered = pinDigits.join('');
+      if(entered.length < 4) return;
+      if(pinAction.value === 'set') {
+        localStorage.setItem('chengtong_mask_pin', entered);
+        hideAmounts.value = true;
+        showPinModal.value = false;
+      } else if(pinAction.value === 'verify') {
+        if(entered === getStoredPin()) {
+          hideAmounts.value = !hideAmounts.value;
+          showPinModal.value = false;
+        } else {
+          pinError.value = true;
+          pinDigits.splice(0,4,'','','','');
+          nextTick(()=>{ pinInputs[0] && pinInputs[0].focus(); });
+        }
+      }
+    }
 
     // === 计算属性 - 不再依赖城市联动 ===
     // totalOtherExpense: 所有出差记录中的其他个人消费合计
@@ -1878,6 +2448,194 @@ const app = createApp({
       if(!confirm('确定删除此工作日志？')) return;
       workLogs.value = workLogs.value.filter(w=>w.id!==id);
       syncToCloud();
+    }
+
+    // === 发票管理 ===
+    function invTypeIcon(type) {
+      return { transport:'🚄', hotel:'🏨', meal:'🍽️', material:'📦' }[type] || '🧾';
+    }
+    function invStatusLabel(status) {
+      return { pending:'待确认', approved:'已确认', rejected:'已退回' }[status] || '待确认';
+    }
+    function emptyInvoiceForm() {
+      return { id:'', type:'transport', invoiceNo:'', invoiceDate:'', sellerName:'', taxNo:'',
+        preTaxAmount:0, taxAmount:0, amount:0, project:'', remark:'',
+        status:'pending', rejectReason:'', image:'', thumbnail:'', _ocrStatus:'' };
+    }
+    function openInvoiceForm(inv) {
+      if(inv) {
+        editingInvoiceId.value = inv.id;
+        Object.assign(invoiceForm, JSON.parse(JSON.stringify(inv)));
+        invoiceForm._ocrStatus = '';
+      } else {
+        editingInvoiceId.value = null;
+        Object.assign(invoiceForm, emptyInvoiceForm());
+      }
+      showInvoiceModal.value = true;
+    }
+    function saveInvoice() {
+      const f = invoiceForm;
+      if(!f.amount && !f.invoiceNo && !f.sellerName) {
+        // 至少填一项
+        alert('请至少填写发票号码、开票方或金额');
+        return;
+      }
+      if(editingInvoiceId.value) {
+        const idx = invoices.value.findIndex(i=>i.id===editingInvoiceId.value);
+        if(idx>=0) {
+          const saved = { ...f };
+          delete saved._ocrStatus;
+          invoices.value.splice(idx, 1, saved);
+        }
+      } else {
+        const saved = { ...f, id: Date.now().toString(36)+Math.random().toString(36).slice(2,6) };
+        delete saved._ocrStatus;
+        invoices.value.unshift(saved);
+      }
+      localStorage.setItem('chengtong_invoices', JSON.stringify(invoices.value));
+      syncInvoiceToCloud();
+      showInvoiceModal.value = false;
+    }
+    function triggerInvUpload() {
+      invFileInput.value && invFileInput.value.click();
+    }
+    function onInvFileSelected(e) {
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      // 读取并压缩图片
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          // 压缩到合理尺寸
+          const maxW = 1200, maxH = 1200;
+          let w = img.width, h = img.height;
+          if(w > maxW || h > maxH) {
+            const scale = Math.min(maxW/w, maxH/h);
+            w = Math.round(w*scale); h = Math.round(h*scale);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          const base64 = canvas.toDataURL('image/jpeg', 0.7);
+          invoiceForm.image = base64;
+          // 生成缩略图
+          const tw = 80, th = 80;
+          const tc = document.createElement('canvas');
+          tc.width = tw; tc.height = th;
+          tc.getContext('2d').drawImage(img, 0, 0, tw, th);
+          invoiceForm.thumbnail = tc.toDataURL('image/jpeg', 0.5);
+          // 尝试OCR
+          doOCR(base64);
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+      e.target.value = '';
+    }
+    async function doOCR(base64Img) {
+      const secretId = localStorage.getItem('tencent_ocr_secret_id');
+      const secretKey = localStorage.getItem('tencent_ocr_secret_key');
+      if(!secretId || !secretKey) {
+        invoiceForm._ocrStatus = '';
+        return;
+      }
+      invoiceForm._ocrStatus = 'loading';
+      try {
+        const host = 'ocr.tencentcloudapi.com';
+        const service = 'ocr';
+        const action = 'GeneralBasicOCR';
+        const version = '2018-11-19';
+        const timestamp = Math.floor(Date.now()/1000);
+        const payload = JSON.stringify({ ImageBase64: base64Img.replace(/^data:image\/\w+;base64,/, '') });
+        // 简化签名（前端直接调用，需在腾讯云控制台配置CORS白名单）
+        const algorithm = 'TC3-HMAC-SHA256';
+        const date = new Date(timestamp*1000).toISOString().slice(0,10).replace(/-/g,'');
+        const credentialScope = date+'/'+service+'/tc3_request';
+        // 使用Web Crypto API签名
+        const hashRes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(payload));
+        const hashedPayload = Array.from(new Uint8Array(hashRes)).map(b=>b.toString(16).padStart(2,'0')).join('');
+        const stringToSign = algorithm+'\n'+timestamp+'\n'+credentialScope+'\n'+hashedPayload;
+        // 简化：直接用fetch调用（实际需要完整签名，这里前端调用需配置API Gateway或CORS）
+        // 注意：纯前端签名较复杂，这里使用简化方案，建议通过后端代理
+        // 先尝试直接调用
+        const resp = await fetch('https://'+host, {
+          method:'POST',
+          headers:{'Content-Type':'application/json','X-TC-Action':action,'X-TC-Version':version,'X-TC-Timestamp':timestamp.toString(),'X-TC-Region':'ap-guangzhou'},
+          body: JSON.stringify({ImageBase64: base64Img.replace(/^data:image\/\w+;base64,/, '')})
+        });
+        const data = await resp.json();
+        if(data.Response && data.Response.TextDetections) {
+          const texts = data.Response.TextDetections.map(t=>t.DetectedText).join('\n');
+          parseOCRResult(texts);
+          invoiceForm._ocrStatus = 'done';
+        } else {
+          invoiceForm._ocrStatus = 'fail';
+        }
+      } catch(err) {
+        console.error('OCR error:', err);
+        invoiceForm._ocrStatus = 'fail';
+      }
+    }
+    function parseOCRResult(text) {
+      // 尝试从OCR文本中提取发票关键字段
+      const lines = text.split('\n').map(l=>l.trim()).filter(Boolean);
+      for(const line of lines) {
+        // 发票号码
+        const noMatch = line.match(/发票号码[：:\s]*(\d{8,20})/);
+        if(noMatch) invoiceForm.invoiceNo = noMatch[1];
+        // 发票代码
+        const codeMatch = line.match(/发票代码[：:\s]*(\d{10,12})/);
+        // 开票日期
+        const dateMatch = line.match(/开票日期[：:\s]*(\d{4}年\d{1,2}月\d{1,2}日)/);
+        if(dateMatch) invoiceForm.invoiceDate = dateMatch[1].replace(/年|月/g,'-').replace('日','');
+        // 金额（价税合计）
+        const amtMatch = line.match(/[价税合计|合计|金额][：:\s*]*[¥￥]?\s*(\d+\.?\d*)/);
+        if(amtMatch && !invoiceForm.amount) invoiceForm.amount = parseFloat(amtMatch[1]);
+        // 税额
+        const taxMatch = line.match(/税额[：:\s]*[¥￥]?\s*(\d+\.?\d*)/);
+        if(taxMatch) invoiceForm.taxAmount = parseFloat(taxMatch[1]);
+        // 不含税金额
+        const preMatch = line.match(/金额[：:\s]*[¥￥]?\s*(\d+\.?\d*)/);
+        if(preMatch && !invoiceForm.preTaxAmount) invoiceForm.preTaxAmount = parseFloat(preMatch[1]);
+        // 开票方
+        const sellerMatch = line.match(/销售方名称[：:\s]*(.+)/) || line.match(/名称[：:\s]*(.+)/);
+        if(sellerMatch && !invoiceForm.sellerName) invoiceForm.sellerName = sellerMatch[1].trim();
+        // 税号
+        const taxNoMatch = line.match(/纳税人识别号[：:\s]*(\w{15,20})/) || line.match(/统一社会信用代码[：:\s]*(\w{15,20})/);
+        if(taxNoMatch) invoiceForm.taxNo = taxNoMatch[1];
+      }
+      // 自动计算价税合计
+      if(invoiceForm.preTaxAmount && invoiceForm.taxAmount && !invoiceForm.amount) {
+        invoiceForm.amount = Math.round((invoiceForm.preTaxAmount + invoiceForm.taxAmount)*100)/100;
+      }
+    }
+    function showInvImage(inv) {
+      invPreviewImg.value = inv.image || '';
+    }
+    async function syncInvoiceToCloud() {
+      // 集成到现有云同步：将invoices加入pushCloud
+      try {
+        const data = await fetchCloud();
+        if(data) {
+          await pushCloud(data.logs||logs.value, data.workLogs||workLogs.value, data.issues||issues.value, data.progresses||progresses.value, invoices.value);
+        }
+      } catch(e) { /* 静默失败，下次同步时会带上 */ }
+    }
+    function exportInvoiceExcel() {
+      showExport.value = false;
+      const ws_data = [['发票类型','发票号码','开票日期','开票方','税号','不含税金额','税额','价税合计','关联项目','状态','退回原因','备注']];
+      invoices.value.forEach(i=>{
+        ws_data.push([
+          {transport:'交通',hotel:'住宿',meal:'餐饮',material:'物资采购'}[i.type]||i.type,
+          i.invoiceNo, i.invoiceDate, i.sellerName, i.taxNo,
+          i.preTaxAmount, i.taxAmount, i.amount,
+          i.project, invStatusLabel(i.status), i.rejectReason||'', i.remark||''
+        ]);
+      });
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ws_data), '发票明细');
+      XLSX.writeFile(wb, '发票明细_'+dayjs().format('YYYY-MM-DD')+'.xlsx');
     }
 
     // === 工作日志导出 ===
@@ -2050,6 +2808,68 @@ const app = createApp({
       a.download='施工进度_'+dayjs().format('YYYYMMDD')+'.doc'; a.click();
     }
 
+    // === 项目施工统一导出 ===
+    function exportCurrentExcel() {
+      showExport.value = false;
+      if(workTab.value==='worklog') exportWorkLogExcel();
+      else if(workTab.value==='issues') exportIssueExcel();
+      else if(workTab.value==='progress') exportProgressExcel();
+    }
+    function exportCurrentWord() {
+      showExport.value = false;
+      if(workTab.value==='worklog') exportWorkLogWord();
+      else if(workTab.value==='issues') exportIssueWord();
+      else if(workTab.value==='progress') exportProgressWord();
+    }
+    function exportAllProjectExcel() {
+      showExport.value = false;
+      const wb = XLSX.utils.book_new();
+      // 工作日志
+      if(sortedWorkLogs.value.length) {
+        const d1 = sortedWorkLogs.value.map(w=>({'日期':w.date,'工作类型':w.type,'工作内容':w.content,'参与人员':w.participants||'','工作地点':w.location||''}));
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(d1), '工作日志');
+      }
+      // 问题库
+      if(filteredIssues.value.length) {
+        const d2 = filteredIssues.value.map(i=>({'问题标题':i.title,'所属项目':i.project,'优先级':i.priority,'状态':i.status,'描述':i.description||'','上报日期':i.reportDate||'','处理人':i.handler||'','解决日期':i.resolveDate||''}));
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(d2), '施工问题库');
+      }
+      // 进度
+      if(sortedProgress.value.length) {
+        const d3 = sortedProgress.value.map(p=>({'任务名称':p.taskName,'所属项目':p.project,'进度':p.progress+'%','计划开始':p.plannedStart||'','计划结束':p.plannedEnd||'','实际完成':p.actualEnd||'','负责人':p.responsible||'','备注':p.remark||''}));
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(d3), '施工进度');
+      }
+      if(!wb.SheetNames.length) return alert('暂无数据可导出');
+      XLSX.writeFile(wb, '项目施工_'+dayjs().format('YYYYMMDD')+'.xlsx');
+    }
+    function exportAllProjectWord() {
+      showExport.value = false;
+      const ts = dayjs().format('YYYY-MM-DD HH:mm');
+      let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+      <head><meta charset="utf-8"><title>项目施工汇总</title>
+      <style>body{font-family:'SimSun',serif;font-size:12pt}table{border-collapse:collapse;width:100%}th,td{border:1px solid #333;padding:6px 8px;text-align:left;vertical-align:top}th{background:#d9e2f3;text-align:center}h2{text-align:center}h3{margin-top:24px;color:#333}</style></head>
+      <body><h2>项目施工汇总报告</h2><p style="text-align:center;color:#666">导出日期：${ts}</p>`;
+      // 工作日志
+      if(sortedWorkLogs.value.length) {
+        const rows = sortedWorkLogs.value.map(w=>`<tr><td style="width:90px">${w.date||'-'}</td><td>${w.type||'-'}</td><td>${w.content||'-'}</td><td>${w.participants||'-'}</td><td>${w.location||'-'}</td></tr>`).join('');
+        html += `<h3>一、工作日志</h3><table><tr><th>日期</th><th>工作类型</th><th>工作内容</th><th>参与人员</th><th>工作地点</th></tr>${rows}</table>`;
+      }
+      // 问题库
+      if(filteredIssues.value.length) {
+        const rows = filteredIssues.value.map(i=>`<tr><td>${i.title||'-'}</td><td>${i.project||'-'}</td><td>${i.priority||'-'}</td><td>${i.status||'-'}</td><td>${i.description||'-'}</td><td>${i.reportDate||'-'}</td><td>${i.handler||'-'}</td><td>${i.resolveDate||'-'}</td></tr>`).join('');
+        html += `<h3>二、施工问题库</h3><table><tr><th>问题标题</th><th>所属项目</th><th>优先级</th><th>状态</th><th>描述</th><th>上报日期</th><th>处理人</th><th>解决日期</th></tr>${rows}</table>`;
+      }
+      // 进度
+      if(sortedProgress.value.length) {
+        const rows = sortedProgress.value.map(p=>`<tr><td>${p.taskName||'-'}</td><td>${p.project||'-'}</td><td>${p.progress>=100?'已完成':p.progress+'%'}</td><td>${p.plannedStart||'-'}</td><td>${p.plannedEnd||'-'}</td><td>${p.actualEnd||'-'}</td><td>${p.responsible||'-'}</td><td>${p.remark||'-'}</td></tr>`).join('');
+        html += `<h3>三、施工进度管理</h3><table><tr><th>任务名称</th><th>所属项目</th><th>进度</th><th>计划开始</th><th>计划结束</th><th>实际完成</th><th>负责人</th><th>备注</th></tr>${rows}</table>`;
+      }
+      html += '</body></html>';
+      const blob = new Blob(['\ufeff'+html],{type:'application/msword'});
+      const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+      a.download='项目施工汇总_'+dayjs().format('YYYYMMDD')+'.doc'; a.click();
+    }
+
     // === 模板 ===
     function saveTemplate() {
       const name = prompt('请输入模板名称：');
@@ -2204,7 +3024,14 @@ const app = createApp({
         await loadFromCloud();
       }
       loadTemplates();
-      nextTick(()=>renderCharts());
+      // 延迟渲染图表，确保DOM就绪
+      nextTick(()=>{
+        renderCharts();
+        // 监听Tab切换，确保图表可见时重新渲染
+        watch(activeTab, (tab)=>{
+          if(tab==='home') nextTick(()=>{ barChart&&barChart.resize(); renderBarChart(); });
+        });
+      });
       window.addEventListener('resize',()=>{ barChart&&barChart.resize(); });
     });
 
@@ -2218,7 +3045,9 @@ const app = createApp({
       form, workLogForm, issueForm, progressForm, sections, filter,
       issues, progresses,
       isReadOnly, showExport, showWorkLogExport, showIssueExport, showProgressExport, workTab,
-      hideAmounts, syncStatus, syncTime, syncLabel,
+      activeTab, totalContactCount,
+      hideAmounts, showPinModal, pinAction, pinDigits, pinError, pinInputs,
+      syncStatus, syncTime, syncLabel,
       barGroupBy, selectedTpl, templates,
       barChartEl,
       filteredLogs, projectTags, contactGroups, toggleContactGroup, isContactGroupOpen, sortedWorkLogs, filteredIssues, sortedProgress,
@@ -2226,6 +3055,7 @@ const app = createApp({
       totalOtherExpense,
       totalTransport, totalHotel, totalMeal, totalSubsidy, totalEntertain, totalAdvance,
       resetFilter, loadFromCloud,
+      toggleMaskWithPin, onPinInput, onPinBackspace, confirmPin,
       calcDays, calcSubsidyTotal, calcTransportTotal, calcMealTotal, calcOtherExpenseTotal,
       calcReimbursementTotal, calcPersonalTotal, isMe,
       openCreate, openEdit, toggleSection,
@@ -2235,9 +3065,17 @@ const app = createApp({
       exportWorkLogExcel, exportWorkLogWord,
       openIssueForm, saveIssue, deleteIssue, exportIssueExcel, exportIssueWord,
       openProgressForm, saveProgress, deleteProgress, exportProgressExcel, exportProgressWord,
+      exportCurrentExcel, exportCurrentWord, exportAllProjectExcel, exportAllProjectWord,
       saveTemplate, loadTemplates, applyTemplate,
       exitReadOnly, renderCharts, renderBarChart,
-      exportExcel, exportWord, exportPDF, fmt
+      exportExcel, exportWord, exportPDF, fmt,
+      // 发票管理
+      invoices, showInvoiceModal, editingInvoiceId, invSearch, invFilterType,
+      invPreviewImg, invFileInput, invoiceForm,
+      invTotalAmount, filteredInvoices,
+      invTypeIcon, invStatusLabel, openInvoiceForm, saveInvoice,
+      triggerInvUpload, onInvFileSelected, showInvImage,
+      exportInvoiceExcel
     };
   }
 });
